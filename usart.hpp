@@ -4,6 +4,7 @@
 /************************************************************************************
  *	Published on: 13-02-2015														*
  *	Author:	jnk0le@hotmail.com														*
+ *  https://github.com/jnk0le														*
  *	This library is distributed under MIT license terms								*
  ************************************************************************************/
 
@@ -158,7 +159,7 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 #define U2X1_BIT			U2X1
 #endif // NO_USART1
 
-#endif //MCU
+#endif // MCU
 
 #ifndef USART0_CONFIG_B // set config bytes for UCSR0B_REGISTER
 	
@@ -170,7 +171,7 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 	#else
 		#define USART0_CONFIG_B (1<<TXEN0_BIT)|(1<<TXCIE0_BIT)|(1<<RXEN0_BIT)|(1<<RXCIE0_BIT)
 	#endif 
-#endif //USART0_CONFIG
+#endif // USART0_CONFIG
 
 #ifndef USART1_CONFIG_B // set config bytes for UCSR1B_REGISTER
 	
@@ -182,7 +183,7 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 	#else
 		#define USART1_CONFIG_B (1<<TXEN1_BIT)|(1<<TXCIE1_BIT)|(1<<RXEN1_BIT)|(1<<RXCIE1_BIT)
 	#endif
-#endif //USART1_CONFIG
+#endif // USART1_CONFIG
 
 class USART
 {
@@ -219,9 +220,11 @@ public: // house
 #ifndef NO_USART_TX
 	void putc(char data); // put character/data into transmitter ring buffer
 	
-	void putstr(char *string); // send string from the dynamic buffer, stops when NULL byte is hit (NULL byte is not included into transmission)
+	void putstr(char *string); // send string from the dynamic buffer 
+	//stops when NULL byte is hit (NULL byte is not included into transmission)
 	#define puts(str) putstr(const_cast<char*>(str))
-	// macro to avoid const *char conversion restrictions // for deprecated usage only (wastes ram memory to keep all string constants), instead of this try to use puts_P
+	// macro to avoid const *char conversion restrictions 
+	// for deprecated usage only (wastes ram memory to keep all string constants), instead of this try to use puts_P
 
 	void puts_p(const char *string);
 	#define puts_P(__s)    puts_p(PSTR(__s)) 
@@ -236,9 +239,13 @@ public: // house
  ************************************************************************************/
 #ifndef NO_USART_RX
 	char getc(void); // get character from the receiver ring buffer
-	void gets(char *buffer); // to avoid stack/buffer overflows, temp buffer size have to be the same as ring buffer or bigger // adds NULL byte at the end of string
-	void gets(char *buffer, uint8_t bufferlimit); // stops reading if NULL byte or bufferlimit-1 is hit // adds NULL byte at the end of string
-	uint8_t getbin(uint8_t &data); // reads binary data from a buffer and loads it into &data byte, in case of empty buffers returning flag is set to BUFFER_EMPTY (1) // don't forget to set RX0/1_BINARY_MODE flag
+	void gets(char *buffer); // to avoid stack/buffer overflows, temp buffer size have to be the same as ring buffer or bigger 
+	// adds NULL byte at the end of string
+	void gets(char *buffer, uint8_t bufferlimit); // stops reading if NULL byte or bufferlimit-1 is hit 
+	// adds NULL byte at the end of string
+	uint8_t getbin(uint8_t &data); // reads binary data from a buffer and loads it into &data byte 
+	//in case of empty buffers returning flag is set to BUFFER_EMPTY (1) 
+	// don't forget to set RX0/1_BINARY_MODE flag
 #endif
 };
 

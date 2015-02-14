@@ -24,8 +24,9 @@
 		#ifdef USART0_U2X_SPEED
 			UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
 		#endif
-			UCSR0B_REGISTER = USART0_CONFIG_B; // (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT); 
-											   // 8n1 is set by default, setting UCSRC is not needed
+			UCSR0B_REGISTER = USART0_CONFIG_B; 
+			// (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT); 
+			// 8n1 is set by default, setting UCSRC is not needed
 			pUSART0 = this; // IS SPARTA
 		}
 		else
@@ -36,8 +37,9 @@
 		#ifdef USART0_U2X_SPEED
 			UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
 		#endif
-			UCSR1B_REGISTER = USART1_CONFIG_B; // (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT); 
-											   // 8n1 is set by default, setting UCSRC is not needed
+			UCSR1B_REGISTER = USART1_CONFIG_B; 
+			// (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT); 
+			// 8n1 is set by default, setting UCSRC is not needed
 			pUSART1 = this; // IS SPARTA
 		}
 		
@@ -57,7 +59,8 @@
 		#ifdef USART0_U2X_SPEED
 			UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
 		#endif
-			UCSR0B_REGISTER = USART0_CONFIG_B; // (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT);
+			UCSR0B_REGISTER = USART0_CONFIG_B; 
+			// (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT);
 			UCSR0C_REGISTER = UCSRC_reg;
 			
 			pUSART0 = this; // IS SPARTA
@@ -70,7 +73,8 @@
 		#ifdef USART0_U2X_SPEED
 			UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
 		#endif
-			UCSR1B_REGISTER = USART1_CONFIG_B; // (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT);
+			UCSR1B_REGISTER = USART1_CONFIG_B; 
+			// (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT);
 			UCSR1C_REGISTER = UCSRC_reg;
 			
 			pUSART1 = this; // IS SPARTA
@@ -91,8 +95,9 @@
 	#ifdef USART0_U2X_SPEED
 		UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
 	#endif
-		UCSR0B_REGISTER = USART0_CONFIG_B; // (1<<TXEN0_BIT)|(1<<RXEN0_BIT)|(1<<TXCIE0_BIT)|(1<<RXCIE0_BIT); 
-										   // 8n1 is set by default, setting UCSRC is not needed 
+		UCSR0B_REGISTER = USART0_CONFIG_B; 
+		// (1<<TXEN0_BIT)|(1<<RXEN0_BIT)|(1<<TXCIE0_BIT)|(1<<RXCIE0_BIT); 
+		// 8n1 is set by default, setting UCSRC is not needed 
 		pUSART0 = this; // IS SPARTA
 	
 	#ifndef NO_USART_TX
@@ -108,7 +113,8 @@
 	#ifdef USART0_U2X_SPEED
 		UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
 	#endif
-		UCSR0B_REGISTER = USART0_CONFIG_B; // (1<<TXEN0_BIT)|(1<<RXEN0_BIT)|(1<<TXCIE0_BIT)|(1<<RXCIE0_BIT);
+		UCSR0B_REGISTER = USART0_CONFIG_B; 
+		// (1<<TXEN0_BIT)|(1<<RXEN0_BIT)|(1<<TXCIE0_BIT)|(1<<RXCIE0_BIT);
 		UCSR0C_REGISTER = UCSRC_reg;
 		
 		pUSART0 = this; // IS SPARTA
@@ -136,11 +142,11 @@
 				
 			#ifdef USE_USART1
 				if(usartct == 0)
-					UDR0_REGISTER = tx_buffer[tmp_tx_first_byte];	// enable transmitter interrupt
+					UDR0_REGISTER = tx_buffer[tmp_tx_first_byte]; // enable transmitter interrupt
 				else
-					UDR1_REGISTER = tx_buffer[tmp_tx_first_byte];	// enable transmitter interrupt
+					UDR1_REGISTER = tx_buffer[tmp_tx_first_byte]; // enable transmitter interrupt
 			#else
-					UDR0_REGISTER = tx_buffer[tmp_tx_first_byte];	// enable transmitter interrupt
+					UDR0_REGISTER = tx_buffer[tmp_tx_first_byte]; // enable transmitter interrupt
 			#endif
 			}
 	}
@@ -159,7 +165,7 @@
 	
 	void USART::putint(int16_t data)
 	{
-		char buffer[7]; //heading, 5 digit bytes, NULL
+		char buffer[7]; // heading, 5 digit bytes, NULL
 		itoa(data, buffer, 10);
 
 		this -> putstr(buffer);
@@ -167,7 +173,7 @@
 	
 	void USART::put_hex(int16_t data)
 	{
-		char buffer[6]; //heading, 4 digit bytes, NULL
+		char buffer[6]; // heading, 4 digit bytes, NULL
 		itoa(data, buffer, 16);
 		
 		this -> putstr(buffer);
@@ -175,12 +181,12 @@
 	
 	void USART::putlong(int32_t data)
 	{
-		char buffer[17]; //heading, 15 digit bytes, NULL
+		char buffer[17]; // heading, 15 digit bytes, NULL
 		ltoa(data, buffer, 10);
 		
 		this -> putstr(buffer);
 	}
-#endif //NO_USART_TX
+#endif // NO_USART_TX
 
 #ifndef NO_USART_RX
 	char USART::getc(void)
@@ -253,14 +259,14 @@
 	
 		register uint8_t tmp_rx_last_byte = pUSART0 -> rx_last_byte + 1; // saves 20 bytes // working only in this way, in the other adds 18 bytes to stock size
 		
-	#ifdef RX0_BINARY_MODE													// not optimal and no one knows why	// originally
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte))					// tmp_rx_last_byte + 1				// pUSART0 -> rx_last_byte + 1
+	#ifdef RX0_BINARY_MODE													// not optimal and no one knows why // originally
+		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte))					// tmp_rx_last_byte + 1 // pUSART0 -> rx_last_byte + 1
 	#else
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r')) // tmp_rx_last_byte + 1				// pUSART0 -> rx_last_byte + 1
+		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r')) // tmp_rx_last_byte + 1 // pUSART0 -> rx_last_byte + 1
 	#endif
 		{
-			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp;					// tmp_rx_last_byte					// pUSART0 -> rx_last_byte
-			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// tmp_rx_last_byte + 1				// pUSART0 -> rx_last_byte + 1
+			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp;					// tmp_rx_last_byte	// pUSART0 -> rx_last_byte
+			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// tmp_rx_last_byte + 1	// pUSART0 -> rx_last_byte + 1
 		}
 	}
 #endif // NO_RX0_INTERRUPT
@@ -292,13 +298,13 @@
 		register uint8_t tmp_rx_last_byte = pUSART1 -> rx_last_byte + 1;
 		
 	#ifdef RX1_BINARY_MODE
-		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte))						//	pUSART1 -> rx_last_byte+1
+		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART1 -> rx_last_byte+1
 	#else
-		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))		//	pUSART1 -> rx_last_byte+1
+		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	//	pUSART1 -> rx_last_byte+1
 	#endif
 		{
-			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;						//	pUSART1 -> rx_last_byte
-			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;		//	pUSART1 -> rx_last_byte+1
+			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	//	pUSART1 -> rx_last_byte
+			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	//	pUSART1 -> rx_last_byte+1
 		}
 	}
 #endif // NO_RX1_INTERRUPT

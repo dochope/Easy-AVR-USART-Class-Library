@@ -29,3 +29,5 @@ defined  NO_USART_RX flag gives
 Program Memory Usage    :   432 bytes   1,3 % Full
 Data Memory Usage       :   10 bytes   0,5 % Full
 
+next step: rewrite it into C
+
