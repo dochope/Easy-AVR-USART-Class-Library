@@ -22,6 +22,7 @@ Program Memory Usage    :   522 bytes   1,6 % Full
 Data Memory Usage       :   10 bytes   0,5 % Full
 
 defined  NO_USART_RX flag gives
+
          text      data       bss       dec       hex   filename
           424         8         2       434       1b2   avrtpp.elf
 
