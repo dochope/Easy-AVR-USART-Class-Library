@@ -2,10 +2,10 @@
 #define USART_HPP
 
 /************************************************************************************
- *	Published on: 13-02-2015														*
- *	Author:	jnk0le@hotmail.com														*
- *  https://github.com/jnk0le														*
- *	This library is distributed under MIT license terms								*
+ *	Published on: 13-02-2015                                                        *
+ *	Author:	jnk0le@hotmail.com                                                      *
+ *  https://github.com/jnk0le                                                       *
+ *	This library is distributed under MIT license terms                             *
  ************************************************************************************/
 
 // DO NOT DEFINE BUFFERS SIZES OR ANY SHARED MACROS IN 'main.cpp' CODE
@@ -204,30 +204,31 @@ public: // house
 #endif
 
 /************************************************************************************
- *							Initializers								            *
+ *                            Initializers                                          *
  ************************************************************************************/
 #ifdef USE_USART1
 	USART(uint16_t baudRate = BAUD_CALC(9600), uint8_t usartcnter = 0);
 	USART(uint8_t UCSRC_reg, uint16_t baudRate, uint8_t usartcnter);
 #else
 	USART(uint16_t baudRate = BAUD_CALC(9600));
-	USART(uint8_t UCSRC_reg, uint16_t baudRate);
+	USART(uint8_t UCSRC_reg, uint16_t baudRate); // UCSRC_reg can be used to set other than 8n1 transmission
 #endif
 	
 /************************************************************************************
- *							Transmitter functions                                   *
+ *                          Transmitter functions                                   *
  ************************************************************************************/
 #ifndef NO_USART_TX
 	void putc(char data); // put character/data into transmitter ring buffer
 	
 	void putstr(char *string); // send string from the dynamic buffer 
-	//stops when NULL byte is hit (NULL byte is not included into transmission)
-	#define puts(str) putstr(const_cast<char*>(str))
+	// stops when NULL byte is hit (NULL byte is not included into transmission)
+	void putstr(char *string, uint8_t BytesToWrite); // in case of bascom users or buffers without NULL byte ending
+		#define puts(str) putstr(const_cast<char*>(str))
 	// macro to avoid const *char conversion restrictions 
-	// for deprecated usage only (wastes ram memory to keep all string constants), instead of this try to use puts_P
+	// for deprecated usage only (wastes sram memory to keep all string constants), instead of this try to use puts_P
 
-	void puts_p(const char *string);
-	#define puts_P(__s)    puts_p(PSTR(__s)) 
+	void puts_p(const char *string); // send string from flash memory 
+		#define puts_P(__s)    puts_p(PSTR(__s)) 
 	// macro to automatically put a string constant into flash
 	
 	void putint(int16_t data);
@@ -235,18 +236,19 @@ public: // house
 	void putlong(int32_t data);
 #endif //NO_USART_TX
 /************************************************************************************
- *							Receiver functions		                                *
+ *                          Receiver functions                                      *
  ************************************************************************************/
 #ifndef NO_USART_RX
-	char getc(void); // get character from the receiver ring buffer
-	void gets(char *buffer); // to avoid stack/buffer overflows, temp buffer size have to be the same as ring buffer or bigger 
+	char getc(void); // get character from receiver ring buffer
+	void gets(char *buffer); // DEPRECATED, only in case of optimizing flash usage, instead of this try to use limited gets
+	// to avoid stack/buffer overflows, temp buffer size have to be the same as ring buffer or bigger 
 	// adds NULL byte at the end of string
 	void gets(char *buffer, uint8_t bufferlimit); // stops reading if NULL byte or bufferlimit-1 is hit 
-	// adds NULL byte at the end of string
+	// adds NULL byte at the end of string (positioned at bufferlimit-1)
 	uint8_t getbin(uint8_t &data); // reads binary data from a buffer and loads it into &data byte 
-	//in case of empty buffers returning flag is set to BUFFER_EMPTY (1) 
+	// in case of empty buffers returning flag is set to BUFFER_EMPTY (1) 
 	// don't forget to set RX0/1_BINARY_MODE flag
-#endif
+#endif // NO_USART_RX
 };
 
 #endif // USART_HPP

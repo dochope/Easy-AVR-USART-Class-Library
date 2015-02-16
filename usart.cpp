@@ -132,7 +132,7 @@
 		register uint8_t tmp_tx_first_byte = tx_first_byte; // saves 2 bytes
 		
 		tx_buffer[tmp_tx_last_byte] = data;
-		tx_last_byte = (tmp_tx_last_byte + 1) & TX_BUFFER_MASK;
+		tx_last_byte = (tmp_tx_last_byte + 1) & TX_BUFFER_MASK; // calculate new position of TX tail in buffer
 		
 		while(tmp_tx_first_byte == tx_last_byte); // wait for free space in buffer
 		
@@ -154,6 +154,12 @@
 	void USART::putstr(char *string)
 	{
 		while(*string)
+			this -> putc(*string++);
+	}
+	
+	void putstr(char *string, uint8_t BytesToWrite)
+	{
+		while(BytesToWrite--)
 			this -> putc(*string++);
 	}
 
@@ -198,7 +204,7 @@
 		
 		temp = (tmp_rx_first_byte == tmp_rx_last_byte) ? 0:rx_buffer[tmp_rx_first_byte];
 		if(tmp_rx_first_byte != tmp_rx_last_byte) 
-			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK;
+			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
 		
 		if(temp == '\n')   temp = 0;
 		return temp;
@@ -211,7 +217,7 @@
 	}
 	void USART::gets(char *buffer, uint8_t bufferlimit)
 	{
-		while(--bufferlimit > 0)
+		while(--bufferlimit)
 		{
 			*buffer = this -> getc();
 			if(*buffer++ == 0)
@@ -225,10 +231,10 @@
 		register uint8_t tmp_rx_first_byte = rx_first_byte;
 		
 		data = rx_buffer[tmp_rx_first_byte];
-		if(tmp_rx_first_byte != rx_last_byte)
+		if(tmp_rx_first_byte != rx_last_byte) // if buffer is not empty
 		{
-			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK;
-			return  COMPLETED; // result = 0
+			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
+			return COMPLETED; // result = 0
 		}
 		else 
 			return BUFFER_EMPTY; // in this case data value is a trash // result = 1
@@ -238,8 +244,9 @@
 #ifndef NO_TX0_INTERRUPT
 	ISR(TX0_INTERRUPT)
 	{
-		register uint8_t tmp_tx_first_byte = pUSART0 -> tx_first_byte = (pUSART0 -> tx_first_byte + 1) & TX_BUFFER_MASK; // saved 4 bytes
-	
+		register uint8_t tmp_tx_first_byte = pUSART0 -> tx_first_byte = (pUSART0 -> tx_first_byte + 1) & TX_BUFFER_MASK; 
+		// calculate new position of TX head in buffer, write back and use it as register variable // saved 4 bytes
+		
 		if(tmp_tx_first_byte != pUSART0 -> tx_last_byte)
 		{
 			UDR0_REGISTER = pUSART0 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
@@ -259,14 +266,14 @@
 	
 		register uint8_t tmp_rx_last_byte = pUSART0 -> rx_last_byte + 1; // saves 20 bytes // working only in this way, in the other adds 18 bytes to stock size
 		
-	#ifdef RX0_BINARY_MODE													// not optimal and no one knows why // originally
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte))					// tmp_rx_last_byte + 1 // pUSART0 -> rx_last_byte + 1
+	#ifdef RX0_BINARY_MODE // not optimal and no one knows why 
+		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte)) // tmp_rx_last_byte + 1 
 	#else
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r')) // tmp_rx_last_byte + 1 // pUSART0 -> rx_last_byte + 1
+		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r')) // tmp_rx_last_byte + 1 
 	#endif
 		{
-			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp;					// tmp_rx_last_byte	// pUSART0 -> rx_last_byte
-			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// tmp_rx_last_byte + 1	// pUSART0 -> rx_last_byte + 1
+			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp; // tmp_rx_last_byte 
+			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK; // calculate new position of RX tail in buffer // tmp_rx_last_byte + 1
 		}
 	}
 #endif // NO_RX0_INTERRUPT
