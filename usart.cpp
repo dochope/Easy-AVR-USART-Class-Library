@@ -157,7 +157,7 @@
 			this -> putc(*string++);
 	}
 	
-	void putstr(char *string, uint8_t BytesToWrite)
+	void USART::putstr(char *string, uint8_t BytesToWrite)
 	{
 		while(BytesToWrite--)
 			this -> putc(*string++);
