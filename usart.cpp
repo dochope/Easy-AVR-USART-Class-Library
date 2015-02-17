@@ -202,7 +202,7 @@
 		register uint8_t tmp_rx_first_byte = rx_first_byte; // saves 4 bytes
 		register uint8_t tmp_rx_last_byte = rx_last_byte; // saves 8 bytes // no one knows how
 		
-		temp = (tmp_rx_first_byte == tmp_rx_last_byte) ? 0:rx_buffer[tmp_rx_first_byte];
+		temp = (tmp_rx_first_byte == tmp_rx_last_byte) ? 0:rx_buffer[tmp_rx_first_byte]; 
 		if(tmp_rx_first_byte != tmp_rx_last_byte) 
 			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
 		
