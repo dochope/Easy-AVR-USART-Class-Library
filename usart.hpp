@@ -8,6 +8,8 @@
  *  This library is distributed under MIT license terms                             *
  ************************************************************************************/
 
+/* If you want more optimized for flash usage library, try out https://github.com/jnk0le/Easy-AVR-USART-C-Library */
+
 // DO NOT DEFINE BUFFERS SIZES OR ANY SHARED MACROS IN 'main.cpp' CODE
 // instead of this, define it in "Project Properties -> AVR C++ Compiler -> Symbols" or try to use -D gcc flag (eg. -DF_CPU=8000000)
 
@@ -221,13 +223,14 @@ public: // house
 #ifndef NO_USART_TX
 	void putc(char data); // put character/data into transmitter ring buffer
 	
-	void putstr(char *string, uint8_t BytesToWrite); // in case of bascom users or buffers without NULL byte ending
+	void putstr(char *string, uint8_t BytesToWrite); // in case of bascom users or buffers without NULL byte ending (binary transmission allowed)
 	void putstr(char *string); // send string from the dynamic buffer 
 	// stops when NULL byte is hit (NULL byte is not included into transmission)
 		#define puts(str) putstr(const_cast<char*>(str))
 		// macro to avoid const *char conversion restrictions 
 		// for deprecated usage only (wastes SRAM data memory to keep all string constants), instead of this try to use puts_P
-
+		#define putstrl putstr // for compatibility with C library
+		
 	void puts_p(const char *string); // send string from flash memory 
 		#define puts_P(__s)    puts_p(PSTR(__s)) 
 		// macro to automatically put a string constant into flash
@@ -246,9 +249,12 @@ public: // house
 	// adds NULL byte at the end of string
 	void gets(char *buffer, uint8_t bufferlimit); // stops reading if NULL byte or bufferlimit-1 is hit 
 	// adds NULL byte at the end of string (positioned at bufferlimit-1)
+		#define getsl gets // for compatibility with C library
+		
 	uint8_t getbin(uint8_t &data); // reads binary data from a buffer and loads it into &data byte 
 	// in case of empty buffers returning flag is set to BUFFER_EMPTY (1) 
 	// don't forget to set RX0/1_BINARY_MODE flag
+	// uint16_t getbin(void); CSIIWWTMMFA
 #endif // NO_USART_RX
 };
 
