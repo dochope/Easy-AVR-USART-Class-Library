@@ -34,7 +34,7 @@
 			UBRR1L_REGISTER = (uint8_t) baudRate;
 			UBRR1H_REGISTER = (baudRate>>8);
 			
-		#ifdef USART0_U2X_SPEED
+		#ifdef USART1_U2X_SPEED
 			UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
 		#endif
 			UCSR1B_REGISTER = USART1_CONFIG_B; 
@@ -70,7 +70,7 @@
 			UBRR1L_REGISTER = (uint8_t) baudRate;
 			UBRR1H_REGISTER = (baudRate>>8);
 			
-		#ifdef USART0_U2X_SPEED
+		#ifdef USART1_U2X_SPEED
 			UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
 		#endif
 			UCSR1B_REGISTER = USART1_CONFIG_B; 
@@ -307,11 +307,11 @@
 	#ifdef RX1_BINARY_MODE
 		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART1 -> rx_last_byte+1
 	#else
-		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	//	pUSART1 -> rx_last_byte+1
+		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART1 -> rx_last_byte+1
 	#endif
 		{
-			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	//	pUSART1 -> rx_last_byte
-			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	//	pUSART1 -> rx_last_byte+1
+			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART1 -> rx_last_byte
+			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART1 -> rx_last_byte+1
 		}
 	}
 #endif // NO_RX1_INTERRUPT

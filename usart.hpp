@@ -53,18 +53,18 @@
 #define TX_BUFFER_SIZE 32 // Size of the ring buffers, must be power of 2
 #endif
 
-#define RX_BUFFER_MASK ( RX_BUFFER_SIZE - 1)
-#define TX_BUFFER_MASK ( TX_BUFFER_SIZE - 1)
+#define RX_BUFFER_MASK (RX_BUFFER_SIZE - 1)
+#define TX_BUFFER_MASK (TX_BUFFER_SIZE - 1)
 
 enum {locked, unlocked};
 enum {COMPLETED = 0, BUFFER_EMPTY = 1};	
 
-#ifdef NO_USART_RX //remove all RX interrupts
+#ifdef NO_USART_RX // remove all RX interrupts
 	#define NO_RX0_INTERRUPT
 	#define NO_RX1_INTERRUPT
 #endif
 
-#ifdef NO_USART_TX //remove all TX interrupts
+#ifdef NO_USART_TX // remove all TX interrupts
 	#define NO_TX0_INTERRUPT
 	#define NO_TX1_INTERRUPT
 #endif
@@ -125,7 +125,7 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 #define U2X0_BIT    		U2X
 #endif
 #if defined(__AVR_ATmega644__)||defined(__AVR_ATmega644P__)||defined(__AVR_ATmega644PA__)\
-||defined(__AVR_ATmega1284P__)||defined(__AVR_ATmega128__)
+||defined(__AVR_ATmega1284P__)||defined(__AVR_ATmega128__)||defined(__AVR_ATmega64__) // (__AVR_ATmega2560__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega640__) // defined(__AVR_ATmega162__) //  defined(__AVR_ATmega164P__) || defined(__AVR_ATmega324P__) || defined(__AVR_ATmega644P__) //644 one usart // 162 164 
 
 #define RX0_INTERRUPT		USART0_RX_vect
 #define TX0_INTERRUPT		USART0_TX_vect
@@ -226,7 +226,7 @@ public: // house
 	// stops when NULL byte is hit (NULL byte is not included into transmission)
 		#define puts(str) putstr(const_cast<char*>(str))
 		// macro to avoid const *char conversion restrictions 
-		// for deprecated usage only (wastes ram data memory to keep all string constants), instead of this try to use puts_P
+		// for deprecated usage only (wastes SRAM data memory to keep all string constants), instead of this try to use puts_P
 
 	void puts_p(const char *string); // send string from flash memory 
 		#define puts_P(__s)    puts_p(PSTR(__s)) 
