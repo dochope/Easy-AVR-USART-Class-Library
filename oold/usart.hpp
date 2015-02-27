@@ -30,22 +30,6 @@
 //#define USART0_U2X_SPEED // enables double speed for USART0 // combining with USE_DOUBLE_SPEED is not necessary
 //#define USART1_U2X_SPEED // enables double speed for USART1 // combining with USE_DOUBLE_SPEED is not necessary
 
-/*****************************640/1280/2560 only*************************************/
-
-//#define NO_USART2 // disable usage of uart2 
-//#define NO_USART3 // disable usage of uart3
-
-//#define NO_RX2_INTERRUPT // disables interrupt handling and frees RX2 gpio port // combining with NO_USART_RX is not necessary
-//#define NO_RX3_INTERRUPT // disables interrupt handling and frees RX3 gpio port // combining with NO_USART_RX is not necessary
-//#define NO_TX2_INTERRUPT // disables interrupt handling and frees TX2 gpio port // combining with NO_USART_TX is not necessary
-//#define NO_TX3_INTERRUPT // disables interrupt handling and frees TX3 gpio port // combining with NO_USART_TX is not necessary
-
-//#define RX2_BINARY_MODE // prepare RX2 interrupt to binary transmission 
-//#define RX3_BINARY_MODE // prepare RX3 interrupt to binary transmission 
-
-//#define USART2_U2X_SPEED // enables double speed for USART2 // combining with USE_DOUBLE_SPEED is not necessary
-//#define USART3_U2X_SPEED // enables double speed for USART3 // combining with USE_DOUBLE_SPEED is not necessary
-
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
@@ -80,22 +64,16 @@ enum {COMPLETED = 0, BUFFER_EMPTY = 1};
 #ifdef NO_USART_RX // remove all RX interrupts
 	#define NO_RX0_INTERRUPT
 	#define NO_RX1_INTERRUPT
-	#define NO_RX2_INTERRUPT
-	#define NO_RX3_INTERRUPT
 #endif
 
 #ifdef NO_USART_TX // remove all TX interrupts
 	#define NO_TX0_INTERRUPT
 	#define NO_TX1_INTERRUPT
-	#define NO_TX2_INTERRUPT
-	#define NO_TX3_INTERRUPT
 #endif
 
 #ifdef USE_DOUBLE_SPEED
 	#define USART0_U2X_SPEED
 	#define USART1_U2X_SPEED
-	#define USART2_U2X_SPEED
-	#define USART3_U2X_SPEED
 #endif
 
 #if defined(__AVR_ATtiny2313__)||defined(__AVR_ATtiny2313A__)||defined(__AVR_ATtiny4313)
@@ -149,11 +127,10 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 #define RXEN0_BIT   		RXEN
 #define U2X0_BIT    		U2X
 #endif
-
 #if defined(__AVR_ATmega644__)||defined(__AVR_ATmega644P__)||defined(__AVR_ATmega644PA__)\
 ||defined(__AVR_ATmega1284P__)||defined(__AVR_ATmega128__)||defined(__AVR_ATmega128L__)\
-||defined(__AVR_ATmega64__)||defined(__AVR_ATmega64L__)||defined(__AVR_ATmega1281__)\
-||defined(__AVR_ATmega2561__)
+||defined(__AVR_ATmega64__)||defined(__AVR_ATmega64L__) 
+
 #define RX0_INTERRUPT		USART0_RX_vect
 #define TX0_INTERRUPT		USART0_TX_vect
 #define UDR0_REGISTER		UDR0
@@ -168,7 +145,7 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 #define RXEN0_BIT   		RXEN0
 #define U2X0_BIT    		U2X0
 
-#if !defined(NO_USART1) && !defined(__AVR_ATmega644__)
+#if undefined(NO_USART1) && undefined(__AVR_ATmega644__)
 #define USE_USART1
 
 #define RX1_INTERRUPT		USART1_RX_vect
@@ -185,93 +162,8 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 #define RXEN1_BIT   		RXEN1
 #define U2X1_BIT    		U2X1
 #endif // NO_USART1 && 644
-#endif
 
-#if defined(__AVR_ATmega640__)||defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-#define RX0_INTERRUPT		USART0_RX_vect
-#define TX0_INTERRUPT		USART0_TX_vect
-#define UDR0_REGISTER		UDR0
-#define UBRR0L_REGISTER		UBRR0L
-#define UBRR0H_REGISTER		UBRR0H
-#define UCSR0A_REGISTER		UCSR0A
-#define UCSR0B_REGISTER		UCSR0B
-#define UCSR0C_REGISTER		UCSR0C
-#define TXCIE0_BIT  		TXCIE0
-#define RXCIE0_BIT  		RXCIE0
-#define TXEN0_BIT   		TXEN0
-#define RXEN0_BIT   		RXEN0
-#define U2X0_BIT    		U2X0
-
-#ifndef NO_USART1
-#define USE_USART1
-
-#define RX1_INTERRUPT		USART1_RX_vect
-#define TX1_INTERRUPT		USART1_TX_vect
-#define UDR1_REGISTER		UDR1
-#define UBRR1L_REGISTER		UBRR1L
-#define UBRR1H_REGISTER		UBRR1H
-#define UCSR1A_REGISTER		UCSR1A
-#define UCSR1B_REGISTER		UCSR1B
-#define UCSR1C_REGISTER		UCSR1C
-#define TXCIE1_BIT  		TXCIE1
-#define RXCIE1_BIT  		RXCIE1
-#define TXEN1_BIT   		TXEN1
-#define RXEN1_BIT   		RXEN1
-#define U2X1_BIT    		U2X1
-#endif // NO_USART1
-
-#ifndef NO_USART2
-#define USE_USART2
-
-#define RX2_INTERRUPT		USART2_RX_vect
-#define TX2_INTERRUPT		USART2_TX_vect
-#define UDR2_REGISTER		UDR2
-#define UBRR2L_REGISTER		UBRR2L
-#define UBRR2H_REGISTER		UBRR2H
-#define UCSR2A_REGISTER		UCSR2A
-#define UCSR2B_REGISTER		UCSR2B
-#define UCSR2C_REGISTER		UCSR2C
-#define TXCIE2_BIT  		TXCIE2
-#define RXCIE2_BIT  		RXCIE2
-#define TXEN2_BIT   		TXEN2
-#define RXEN2_BIT   		RXEN2
-#define U2X2_BIT    		U2X2
-#endif // NO_USART2
-
-#ifndef NO_USART3
-#define USE_USART3
-
-#define RX3_INTERRUPT		USART3_RX_vect
-#define TX3_INTERRUPT		USART3_TX_vect
-#define UDR3_REGISTER		UDR3
-#define UBRR3L_REGISTER		UBRR3L
-#define UBRR3H_REGISTER		UBRR3H
-#define UCSR3A_REGISTER		UCSR3A
-#define UCSR3B_REGISTER		UCSR3B
-#define UCSR3C_REGISTER		UCSR3C
-#define TXCIE3_BIT  		TXCIE3
-#define RXCIE3_BIT  		RXCIE3
-#define TXEN3_BIT   		TXEN3
-#define RXEN3_BIT   		RXEN3
-#define U2X3_BIT    		U2X3
-#endif // NO_USART3
-
-#endif // 640/1280/2560
-
-#ifndef USE_USART1
-	#define NO_TX1_INTERRUPT
-	#define NO_RX1_INTERRUPT
-#endif
-
-#ifndef USE_USART2
-	#define NO_TX2_INTERRUPT
-	#define NO_RX2_INTERRUPT
-#endif
-
-#ifndef USE_USART3
-	#define NO_TX3_INTERRUPT
-	#define NO_RX3_INTERRUPT
-#endif
+#endif // MCU
 
 #ifndef USART0_CONFIG_B // set config bytes for UCSR0B_REGISTER
 	
@@ -297,30 +189,6 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 	#endif
 #endif // USART1_CONFIG
 
-#ifndef USART2_CONFIG_B // set config bytes for UCSR2B_REGISTER
-
-	#if defined(NO_RX2_INTERRUPT)
-		#define USART2_CONFIG_B (1<<TXEN2_BIT)|(1<<TXCIE2_BIT)
-
-	#elif defined(NO_TX2_INTERRUPT)
-		#define USART2_CONFIG_B (1<<RXEN2_BIT)|(1<<RXCIE2_BIT)
-	#else
-		#define USART2_CONFIG_B (1<<TXEN2_BIT)|(1<<TXCIE2_BIT)|(1<<RXEN2_BIT)|(1<<RXCIE2_BIT)
-	#endif
-#endif // USART2_CONFIG
-
-#ifndef USART3_CONFIG_B // set config bytes for UCSR3B_REGISTER
-
-	#if defined(NO_RX3_INTERRUPT)
-		#define USART3_CONFIG_B (1<<TXEN3_BIT)|(1<<TXCIE3_BIT)
-
-	#elif defined(NO_TX3_INTERRUPT)
-		#define USART3_CONFIG_B (1<<RXEN3_BIT)|(1<<RXCIE3_BIT)
-	#else
-		#define USART3_CONFIG_B (1<<TXEN3_BIT)|(1<<TXCIE3_BIT)|(1<<RXEN3_BIT)|(1<<RXCIE3_BIT)
-	#endif
-#endif // USART3_CONFIG
-
 class USART
 {
 public: // house
@@ -335,14 +203,14 @@ public: // house
 	char rx_buffer[RX_BUFFER_SIZE];
 #endif
 
-#if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
+#ifdef USE_USART1
 	uint8_t usartct;
 #endif
 
 /************************************************************************************
  *                            Initializers                                          *
  ************************************************************************************/
-#if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
+#ifdef USE_USART1
 	USART(uint16_t baudRate = BAUD_CALC(9600), uint8_t usartcnter = 0);
 	USART(uint8_t UCSRC_reg, uint16_t baudRate, uint8_t usartcnter);
 #else
@@ -389,8 +257,6 @@ public: // house
 	// in case of empty buffers returning flag is set to BUFFER_EMPTY (1) 
 	// don't forget to set RX0/1_BINARY_MODE flag
 	// uint16_t getbin(void); CSIIWWTMMFA
-	
-	//uint8_t AvailableBytes(void); CSIIWWTMMFA BytesInBuffer
 #endif // NO_USART_RX
 };
 
