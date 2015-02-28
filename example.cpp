@@ -18,8 +18,12 @@ int main(void)
 	
 	while(1)
     {
+		uart0.puts("bytes waiting in buffer : ");
+		uart0.putint(uart0.AvailableBytes()); // ask for bytes waiting in receiver buffer
 		uart0.gets(buffer, 13); // read 13 bytes or one line from usart buffer
+		uart0.puts("/r/n");
+		
 		uart1.putstr(buffer); // write dynamic string to usart buffer
-		_delay_ms(1000);
+		_delay_ms(5000);
     }
 }
