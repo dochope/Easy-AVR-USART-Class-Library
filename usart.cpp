@@ -215,7 +215,7 @@
 	void USART::putc(char data)
 	{
 		register uint8_t tmp_tx_last_byte = tx_last_byte;
-		//register uint8_t tmp_tx_first_byte = tx_first_byte; // causes issues, blocking at transmit buffer overflow
+		//register uint8_t tmp_tx_first_byte = tx_first_byte; // causes issues, makes infinite loop at transmit buffer overflow
 		
 		tx_buffer[tmp_tx_last_byte] = data;
 		tmp_tx_last_byte = tx_last_byte = (tmp_tx_last_byte + 1) & TX_BUFFER_MASK; // calculate new position of TX tail in buffer
@@ -335,6 +335,11 @@
 		}
 		else 
 			return BUFFER_EMPTY; // in this case data value is a trash // result = 1
+	}
+	
+	uint8_t USART::AvailableBytes(void)
+	{
+		return (rx_last_byte - rx_first_byte) & RX_BUFFER_MASK;
 	}
 #endif // NO_USART_RX
 

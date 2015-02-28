@@ -46,6 +46,8 @@
 //#define USART2_U2X_SPEED // enables double speed for USART2 // combining with USE_DOUBLE_SPEED is not necessary
 //#define USART3_U2X_SPEED // enables double speed for USART3 // combining with USE_DOUBLE_SPEED is not necessary
 
+//#define USE_EXTERNAL_BUFFER // coming soon
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
@@ -390,7 +392,7 @@ public: // house
 	// don't forget to set RX0/1_BINARY_MODE flag
 	// uint16_t getbin(void); CSIIWWTMMFA
 	
-	//uint8_t AvailableBytes(void); CSIIWWTMMFA BytesInBuffer
+	uint8_t AvailableBytes(void); // returns number of bytes waiting in the receiver buffer
 #endif // NO_USART_RX
 };
 
