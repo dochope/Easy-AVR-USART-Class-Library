@@ -289,6 +289,24 @@
 		
 		this -> putstr(buffer);
 	}
+	void USART::putfloat(float data)
+	{
+		char buffer[16];
+		dtostrf(data, 15, 6, buffer);
+		
+		char *p = buffer;
+		while(*p == ' ') // remove all unwanted spaces
+			p++;
+		
+		this -> putstr(p);
+	}
+	void USART::putfloat(float data, uint8_t size, uint8_t precision)
+	{
+		char buffer[size+1];
+		dtostrf(data, size, precision, buffer);
+		
+		this -> putstr(buffer);
+	}
 #endif // NO_USART_TX
 
 #ifndef NO_USART_RX

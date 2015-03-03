@@ -374,6 +374,8 @@ public: // house
 	void putint(int16_t data);
 	void put_hex(int16_t data);
 	void putlong(int32_t data);
+	void putfloat(float data);
+	void putfloat(float data, uint8_t size, uint8_t precision);
 #endif // NO_USART_TX
 /************************************************************************************
  *                           Receiver functions                                     *
