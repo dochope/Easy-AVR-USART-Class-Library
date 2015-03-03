@@ -23,7 +23,7 @@ gives
           502        14         2       518       206   avrtpp.elf
    
 Program Memory Usage    :   516 bytes   1,6 % Full
-Data Memory Usage       :   10 bytes   0,5 % Full
+Data Memory Usage       :   16 bytes   0,5 % Full
 
 defined  NO_USART_RX flag gives
 
