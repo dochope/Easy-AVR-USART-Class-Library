@@ -305,7 +305,11 @@
 		char buffer[size+1];
 		dtostrf(data, size, precision, buffer);
 		
-		this -> putstr(buffer);
+		char *p = buffer;
+		while(*p == ' ') // remove all unwanted spaces
+			p++;
+		
+		this -> putstr(p);
 	}
 #endif // NO_USART_TX
 
