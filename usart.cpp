@@ -342,7 +342,7 @@
 			if(*buffer++ == 0)
 				return;
 		}
-		*buffer = 0;
+		*buffer = 0; // set last byte in buffer to NULL 
 	}
 	
 	uint8_t USART::getbin(uint8_t &data)
