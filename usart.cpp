@@ -222,30 +222,30 @@
 		
 		while(tx_first_byte == tmp_tx_last_byte); // wait for free space in buffer
 		
-			if(interrupt_semaphore == unlocked) // if transmitter interrupt is disabled
-			{
-				interrupt_semaphore = locked;
+		if(interrupt_semaphore == unlocked) // if transmitter interrupt is disabled
+		{
+			interrupt_semaphore = locked;
 				
-			#if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
-				switch(usartct)
-				{
-				#ifndef NO_TX0_INTERRUPT
-					case 0: UDR0_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-				#endif
-				#ifndef NO_TX1_INTERRUPT
-					case 1: UDR1_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-				#endif
-				#ifndef NO_TX2_INTERRUPT
-					case 2: UDR2_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-				#endif
-				#ifndef NO_TX3_INTERRUPT
-					case 3: UDR3_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-				#endif
-				}
-			#else
-					UDR0_REGISTER = tx_buffer[tx_first_byte]; // enable transmitter interrupt
+		#if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
+			switch(usartct)
+			{
+			#ifndef NO_TX0_INTERRUPT
+				case 0: UDR0_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
+			#endif
+			#ifndef NO_TX1_INTERRUPT
+				case 1: UDR1_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
+			#endif
+			#ifndef NO_TX2_INTERRUPT
+				case 2: UDR2_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
+			#endif
+			#ifndef NO_TX3_INTERRUPT
+				case 3: UDR3_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
 			#endif
 			}
+		#else
+			UDR0_REGISTER = tx_buffer[tx_first_byte]; // enable transmitter interrupt
+		#endif
+		}
 	}
 
 	void USART::putstr(char *string)
