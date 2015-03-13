@@ -158,7 +158,7 @@
 	
 	void USART::set_U2X(void)
 	{
-		UCSR0A_REGISTER |= (1<<U2X0_BIT)
+		UCSR0A_REGISTER |= (1<<U2X0_BIT);
 	}
 #endif //USE_USART1
 
