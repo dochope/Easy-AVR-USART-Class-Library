@@ -6,8 +6,9 @@
 
 #include "usart.hpp"
 
+#ifdef USE_USART0
 	USART *pUSART0;
-
+#endif
 #ifdef USE_USART1
 	USART *pUSART1;
 #endif
@@ -19,71 +20,70 @@
 #endif
 
 #if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
+	
 	USART::USART(uint16_t baudRate, uint8_t usartcnter)
 	{
 		usartct = usartcnter;
 		switch(usartcnter)
 		{
-		case 0:
-			UBRR0L_REGISTER = (uint8_t) baudRate;
-			UBRR0H_REGISTER = (baudRate>>8);
-		
-		#ifdef USART0_U2X_SPEED
-			UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
-		#endif
-			UCSR0B_REGISTER = USART0_CONFIG_B; 
-			// (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT); 
-			// 8n1 is set by default, setting UCSRC is not needed
-			pUSART0 = this; // IS SPARTA
-			break;
-			
 		#ifdef USE_USART1
-		case 1:
-			UBRR1L_REGISTER = (uint8_t) baudRate;
-			UBRR1H_REGISTER = (baudRate>>8);
+			case 0:
+				UBRR0L_REGISTER = (uint8_t) baudRate;
+				UBRR0H_REGISTER = (baudRate>>8);
 		
-		#ifdef USART1_U2X_SPEED
-			UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
-		#endif
-			UCSR1B_REGISTER = USART1_CONFIG_B;
-			// (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT);
-			// 8n1 is set by default, setting UCSRC is not needed
-			pUSART1 = this; // IS SPARTA
-			break;
+			#ifdef USART0_U2X_SPEED
+				UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
+			#endif
+				UCSR0B_REGISTER = USART0_CONFIG_B; 
+				// (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT); 
+				// 8n1 is set by default, setting UCSRC is not needed
+				pUSART0 = this; // IS SPARTA
+				break;
+		#endif // USE_USART0
+		#ifdef USE_USART1
+			case 1:
+				UBRR1L_REGISTER = (uint8_t) baudRate;
+				UBRR1H_REGISTER = (baudRate>>8);
+		
+			#ifdef USART1_U2X_SPEED
+				UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
+			#endif
+				UCSR1B_REGISTER = USART1_CONFIG_B;
+				// (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT);
+				// 8n1 is set by default, setting UCSRC is not needed
+				pUSART1 = this; // IS SPARTA
+				break;
 			
-		#endif
-		
+		#endif // USE_USART1
 		#ifdef USE_USART2
-		case 2:
-			UBRR2L_REGISTER = (uint8_t) baudRate;
-			UBRR2H_REGISTER = (baudRate>>8);
+			case 2:
+				UBRR2L_REGISTER = (uint8_t) baudRate;
+				UBRR2H_REGISTER = (baudRate>>8);
 		
-		#ifdef USART2_U2X_SPEED
-			UCSR2A_REGISTER |= (1<<U2X2_BIT); // enable double speed
-		#endif
-			UCSR2B_REGISTER = USART2_CONFIG_B;
-			// (1<<TXCIE2_BIT)|(1<<RXCIE2_BIT)|(1<<TXEN2_BIT)|(1<<RXEN2_BIT);
-			// 8n1 is set by default, setting UCSRC is not needed
-			pUSART2 = this; // IS SPARTA
-			break;
+			#ifdef USART2_U2X_SPEED
+				UCSR2A_REGISTER |= (1<<U2X2_BIT); // enable double speed
+			#endif
+				UCSR2B_REGISTER = USART2_CONFIG_B;
+				// (1<<TXCIE2_BIT)|(1<<RXCIE2_BIT)|(1<<TXEN2_BIT)|(1<<RXEN2_BIT);
+				// 8n1 is set by default, setting UCSRC is not needed
+				pUSART2 = this; // IS SPARTA
+				break;
 		
-		#endif
-		
+		#endif // USE_USART2
 		#ifdef USE_USART3
-		case 3:
-			UBRR3L_REGISTER = (uint8_t) baudRate;
-			UBRR3H_REGISTER = (baudRate>>8);
+			case 3:
+				UBRR3L_REGISTER = (uint8_t) baudRate;
+				UBRR3H_REGISTER = (baudRate>>8);
 		
-		#ifdef USART3_U2X_SPEED
-			UCSR3A_REGISTER |= (1<<U2X3_BIT); // enable double speed
-		#endif
-			UCSR3B_REGISTER = USART3_CONFIG_B;
-			// (1<<TXCIE3_BIT)|(1<<RXCIE3_BIT)|(1<<TXEN3_BIT)|(1<<RXEN3_BIT);
-			// 8n1 is set by default, setting UCSRC is not needed
-			pUSART3 = this; // IS SPARTA
-			break;
-		
-		#endif
+			#ifdef USART3_U2X_SPEED
+				UCSR3A_REGISTER |= (1<<U2X3_BIT); // enable double speed
+			#endif
+				UCSR3B_REGISTER = USART3_CONFIG_B;
+				// (1<<TXCIE3_BIT)|(1<<RXCIE3_BIT)|(1<<TXEN3_BIT)|(1<<RXEN3_BIT);
+				// 8n1 is set by default, setting UCSRC is not needed
+				pUSART3 = this; // IS SPARTA
+				break;
+		#endif // USE_USART3
 		}
 		
 	#ifndef NO_USART_TX
@@ -91,84 +91,44 @@
 	#endif
 	}
 	
-	USART::USART(uint8_t UCSRC_reg, uint16_t baudRate, uint8_t usartcnter)
+	void USART::set_UCSRC(uint8_t UCSRC_reg);
 	{
-		usartct = usartcnter;
-		switch(usartcnter)
+		switch(usartct)
 		{
-		case 0:
-			UBRR0L_REGISTER = (uint8_t) baudRate;
-			UBRR0H_REGISTER = (baudRate>>8);
-			
-		#ifdef USART0_U2X_SPEED
-			UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
-		#endif
-			UCSR0B_REGISTER = USART0_CONFIG_B;
-			// (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT);
-			// 8n1 is set by default, setting UCSRC is not needed
-			UCSR0C_REGISTER |= UCSRC_reg;
-			
-			pUSART0 = this; // IS SPARTA
-			break;
-			
+		#ifdef USE_USART0
+			case 0: UCSR0C_REGISTER |= UCSRC_reg; break;
+		#endif // USE_USART0
 		#ifdef USE_USART1
-		case 1:
-			UBRR1L_REGISTER = (uint8_t) baudRate;
-			UBRR1H_REGISTER = (baudRate>>8);
-			
-		#ifdef USART1_U2X_SPEED
-			UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
-		#endif
-			UCSR1B_REGISTER = USART1_CONFIG_B;
-			// (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT);
-			// 8n1 is set by default, setting UCSRC is not needed
-			UCSR1C_REGISTER |= UCSRC_reg;
-			
-			pUSART1 = this; // IS SPARTA
-			break;
-			
-		#endif
-			
+			case 1: UCSR1C_REGISTER |= UCSRC_reg; break;
+		#endif // USE_USART1
 		#ifdef USE_USART2
-		case 2:
-			UBRR2L_REGISTER = (uint8_t) baudRate;
-			UBRR2H_REGISTER = (baudRate>>8);
-			
-		#ifdef USART2_U2X_SPEED
-			UCSR2A_REGISTER |= (1<<U2X2_BIT); // enable double speed
-		#endif
-			UCSR2B_REGISTER = USART2_CONFIG_B;
-			// (1<<TXCIE2_BIT)|(1<<RXCIE2_BIT)|(1<<TXEN2_BIT)|(1<<RXEN2_BIT);
-			// 8n1 is set by default, setting UCSRC is not needed
-			UCSR2C_REGISTER |= UCSRC_reg;
-			
-			pUSART2 = this; // IS SPARTA
-			break;
-			
-		#endif
-			
+			case 2: UCSR2C_REGISTER |= UCSRC_reg; break;
+		#endif // USE_USART2
 		#ifdef USE_USART3
-		case 3:
-			UBRR3L_REGISTER = (uint8_t) baudRate;
-			UBRR3H_REGISTER = (baudRate>>8);
-			
-		#ifdef USART3_U2X_SPEED
-			UCSR3A_REGISTER |= (1<<U2X3_BIT); // enable double speed
-		#endif
-			UCSR3B_REGISTER = USART3_CONFIG_B;
-			// (1<<TXCIE3_BIT)|(1<<RXCIE3_BIT)|(1<<TXEN3_BIT)|(1<<RXEN3_BIT);
-			// 8n1 is set by default, setting UCSRC is not needed
-			UCSR3C_REGISTER |= UCSRC_reg;
-			
-			pUSART3 = this; // IS SPARTA
-			break;
-			
-		#endif
+			case 3: UCSR3C_REGISTER |= UCSRC_reg; //break;
+		#endif // USE_USART3
 		}
 		
-	#ifndef NO_USART_TX
-		interrupt_semaphore = unlocked;
-	#endif
+	}
+	
+	void USART::set_U2X(void) 
+	{
+		switch(usartct)
+		{
+		#ifdef USE_USART0
+			case 0: UCSR0A_REGISTER |= (1<<U2X0_BIT); break;
+		#endif // USE_USART0
+		#ifdef USE_USART1
+			case 1: UCSR1A_REGISTER |= (1<<U2X1_BIT); break;
+		#endif // USE_USART1
+		#ifdef USE_USART2
+			case 2: UCSR2A_REGISTER |= (1<<U2X2_BIT); break;
+		#endif // USE_USART2
+		#ifdef USE_USART3
+			case 3: UCSR3A_REGISTER |= (1<<U2X3_BIT); //break;
+		#endif // USE_USART3
+		}
+		
 	}
 	
 #else // no USART1/2/3
@@ -191,23 +151,14 @@
 	#endif
 	}
 	
-	USART::USART(uint8_t UCSRC_reg, uint16_t baudRate)
+	void USART::set_UCSRC(uint8_t UCSRC_reg);
 	{
-		UBRR0L_REGISTER = (uint8_t) baudRate;
-		UBRR0H_REGISTER = (baudRate>>8);
-		
-	#ifdef USART0_U2X_SPEED
-		UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
-	#endif
-		UCSR0B_REGISTER = USART0_CONFIG_B; 
-		// (1<<TXEN0_BIT)|(1<<RXEN0_BIT)|(1<<TXCIE0_BIT)|(1<<RXCIE0_BIT);
 		UCSR0C_REGISTER |= UCSRC_reg;
-		
-		pUSART0 = this; // IS SPARTA
-		
-	#ifndef NO_USART_TX
-		interrupt_semaphore = unlocked;
-	#endif
+	}
+	
+	void USART::set_U2X(void)
+	{
+		UCSR0A_REGISTER |= (1<<U2X0_BIT);
 	}
 #endif //USE_USART1
 
@@ -370,7 +321,6 @@
 	{
 		register uint8_t tmp_tx_first_byte = pUSART0 -> tx_first_byte = (pUSART0 -> tx_first_byte + 1) & TX_BUFFER_MASK; 
 		// calculate new position of TX head in buffer, write back and use it as register variable 
-		
 		if(tmp_tx_first_byte != pUSART0 -> tx_last_byte)
 		{
 			UDR0_REGISTER = pUSART0 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
@@ -379,6 +329,7 @@
 		{
 			pUSART0 -> interrupt_semaphore = unlocked;
 		}
+		
 	}
 #endif // NO_TX0_INTERRUPT
 
@@ -399,6 +350,7 @@
 			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp; // tmp_rx_last_byte 
 			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK; // calculate new position of RX tail in buffer // tmp_rx_last_byte + 1
 		}
+		
 	}
 #endif // NO_RX0_INTERRUPT
 
@@ -415,6 +367,7 @@
 		{
 			pUSART1 -> interrupt_semaphore = unlocked;
 		}
+		
 	}
 #endif // NO_TX1_INTERRUPT
 
@@ -435,79 +388,84 @@
 			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART1 -> rx_last_byte
 			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART1 -> rx_last_byte+1
 		}
+		
 	}
 #endif // NO_RX1_INTERRUPT
 
 #ifndef NO_TX2_INTERRUPT
-ISR(TX2_INTERRUPT)
-{
-	register uint8_t tmp_tx_first_byte = pUSART2 -> tx_first_byte = (pUSART2 -> tx_first_byte + 1) & TX_BUFFER_MASK;
+	ISR(TX2_INTERRUPT)
+	{
+		register uint8_t tmp_tx_first_byte = pUSART2 -> tx_first_byte = (pUSART2 -> tx_first_byte + 1) & TX_BUFFER_MASK;
 	
-	if(tmp_tx_first_byte != pUSART2 -> tx_last_byte)
-	{
-		UDR2_REGISTER = pUSART2 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+		if(tmp_tx_first_byte != pUSART2 -> tx_last_byte)
+		{
+			UDR2_REGISTER = pUSART2 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+		}
+		else
+		{
+			pUSART2 -> interrupt_semaphore = unlocked;
+		}
+	
 	}
-	else
-	{
-		pUSART2 -> interrupt_semaphore = unlocked;
-	}
-}
 #endif // NO_TX2_INTERRUPT
 
 #ifndef NO_RX2_INTERRUPT
-ISR(RX2_INTERRUPT)
-{
-	register char tmp;
-	tmp = UDR2_REGISTER; // save received character to temporary register
+	ISR(RX2_INTERRUPT)
+	{
+		register char tmp;
+		tmp = UDR2_REGISTER; // save received character to temporary register
 	
-	register uint8_t tmp_rx_last_byte = pUSART2 -> rx_last_byte + 1;
+		register uint8_t tmp_rx_last_byte = pUSART2 -> rx_last_byte + 1;
 	
 	#ifdef RX2_BINARY_MODE
-	if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART2 -> rx_last_byte+1
+		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART2 -> rx_last_byte+1
 	#else
-	if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART2 -> rx_last_byte+1
+		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART2 -> rx_last_byte+1
 	#endif
-	{
-		pUSART2 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART2 -> rx_last_byte
-		pUSART2 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART2 -> rx_last_byte+1
+		{
+			pUSART2 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART2 -> rx_last_byte
+			pUSART2 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART2 -> rx_last_byte+1
+		}
+	
 	}
-}
 #endif // NO_RX2_INTERRUPT
 
 #ifndef NO_TX3_INTERRUPT
-ISR(TX3_INTERRUPT)
-{
-	register uint8_t tmp_tx_first_byte = pUSART3 -> tx_first_byte = (pUSART3 -> tx_first_byte + 1) & TX_BUFFER_MASK;
+	ISR(TX3_INTERRUPT)
+	{
+		register uint8_t tmp_tx_first_byte = pUSART3 -> tx_first_byte = (pUSART3 -> tx_first_byte + 1) & TX_BUFFER_MASK;
 	
-	if(tmp_tx_first_byte != pUSART3 -> tx_last_byte)
-	{
-		UDR3_REGISTER = pUSART3 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+		if(tmp_tx_first_byte != pUSART3 -> tx_last_byte)
+		{
+			UDR3_REGISTER = pUSART3 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+		}
+		else
+		{
+			pUSART3 -> interrupt_semaphore = unlocked;
+		}
+		
 	}
-	else
-	{
-		pUSART3 -> interrupt_semaphore = unlocked;
-	}
-}
 #endif // NO_TX3_INTERRUPT
 
 #ifndef NO_RX3_INTERRUPT
-ISR(RX3_INTERRUPT)
-{
-	register char tmp;
-	tmp = UDR3_REGISTER; // save received character to temporary register
+	ISR(RX3_INTERRUPT)
+	{
+		register char tmp;
+		tmp = UDR3_REGISTER; // save received character to temporary register
 	
-	register uint8_t tmp_rx_last_byte = pUSART3 -> rx_last_byte + 1;
+		register uint8_t tmp_rx_last_byte = pUSART3 -> rx_last_byte + 1;
 	
 	#ifdef RX3_BINARY_MODE
-	if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART3 -> rx_last_byte+1
+		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART3 -> rx_last_byte+1
 	#else
-	if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART3 -> rx_last_byte+1
+		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART3 -> rx_last_byte+1
 	#endif
-	{
-		pUSART3 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART3 -> rx_last_byte
-		pUSART3 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART3 -> rx_last_byte+1
+		{
+			pUSART3 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART3 -> rx_last_byte
+			pUSART3 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART3 -> rx_last_byte+1
+		}
+		
 	}
-}
 #endif // NO_RX3_INTERRUPT
 
 
