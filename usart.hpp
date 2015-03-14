@@ -13,8 +13,8 @@
 // DO NOT DEFINE BUFFERS SIZES OR ANY SHARED MACROS IN 'main.cpp' CODE
 // instead of this, define it in "Project Properties -> AVR C++ Compiler -> Symbols" or try to use -D gcc flag (eg. -DF_CPU=8000000)
 
-//#define NO_USART_RX // disable all receiver code and dependencies // saves ca. 90 bytes
-//#define NO_USART_TX // disable all transmitter code and dependencies // saves ca. 82 bytes
+//#define NO_USART_RX // disable all receiver code and dependencies 
+//#define NO_USART_TX // disable all transmitter code and dependencies
 
 //#define USE_DOUBLE_SPEED // DEPRECATED // enables double speed for all available USART interfaces 
 
