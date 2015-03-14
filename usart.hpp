@@ -21,6 +21,8 @@
 //#define NO_RX0_INTERRUPT // disables interrupt handling and frees RX0 gpio port // combining with NO_USART_RX is not necessary
 //#define NO_TX0_INTERRUPT // disables interrupt handling and frees TX0 gpio port // combining with NO_USART_TX is not necessary
 
+//#define RX0_BINARY_MODE // prepare RX0 interrupt to binary transmission
+
 //#define USART_USE_SEPARATED_BUFFERS // coming soon
 
 /*****************************multiple usart config*************************************/
@@ -30,17 +32,14 @@
 //#define NO_USART2 // disable usage of uart2 
 //#define NO_USART3 // disable usage of uart3
 
-//#define NO_RX0_INTERRUPT // disables interrupt handling and frees RX0 gpio port // combining with NO_USART_RX is not necessary
 //#define NO_RX1_INTERRUPT // disables interrupt handling and frees RX1 gpio port // combining with NO_USART_RX is not necessary
 //#define NO_RX2_INTERRUPT // disables interrupt handling and frees RX2 gpio port // combining with NO_USART_RX is not necessary
 //#define NO_RX3_INTERRUPT // disables interrupt handling and frees RX3 gpio port // combining with NO_USART_RX is not necessary
 
-//#define NO_TX0_INTERRUPT // disables interrupt handling and frees TX0 gpio port // combining with NO_USART_TX is not necessary
 //#define NO_TX1_INTERRUPT // disables interrupt handling and frees TX1 gpio port // combining with NO_USART_TX is not necessary
 //#define NO_TX2_INTERRUPT // disables interrupt handling and frees TX2 gpio port // combining with NO_USART_TX is not necessary
 //#define NO_TX3_INTERRUPT // disables interrupt handling and frees TX3 gpio port // combining with NO_USART_TX is not necessary
 
-//#define RX0_BINARY_MODE // prepare RX0 interrupt to binary transmission
 //#define RX1_BINARY_MODE // prepare RX1 interrupt to binary transmission
 //#define RX2_BINARY_MODE // prepare RX2 interrupt to binary transmission 
 //#define RX3_BINARY_MODE // prepare RX3 interrupt to binary transmission 
