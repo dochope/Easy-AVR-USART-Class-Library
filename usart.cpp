@@ -21,15 +21,15 @@
 
 #if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
 	
-	USART::USART(uint16_t baudRate, uint8_t usartcnter)
+	USART::USART(uint16_t ubbr_value, uint8_t usartcnter)
 	{
 		usartct = usartcnter;
 		switch(usartcnter)
 		{
 		#ifdef USE_USART1
 			case 0:
-				UBRR0L_REGISTER = (uint8_t) baudRate;
-				UBRR0H_REGISTER = (baudRate>>8);
+				UBRR0L_REGISTER = (uint8_t) ubbr_value;
+				UBRR0H_REGISTER = (ubbr_value>>8);
 		
 			#ifdef USART0_U2X_SPEED
 				UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
@@ -42,8 +42,8 @@
 		#endif // USE_USART0
 		#ifdef USE_USART1
 			case 1:
-				UBRR1L_REGISTER = (uint8_t) baudRate;
-				UBRR1H_REGISTER = (baudRate>>8);
+				UBRR1L_REGISTER = (uint8_t) ubbr_value;
+				UBRR1H_REGISTER = (ubbr_value>>8);
 		
 			#ifdef USART1_U2X_SPEED
 				UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
@@ -57,8 +57,8 @@
 		#endif // USE_USART1
 		#ifdef USE_USART2
 			case 2:
-				UBRR2L_REGISTER = (uint8_t) baudRate;
-				UBRR2H_REGISTER = (baudRate>>8);
+				UBRR2L_REGISTER = (uint8_t) ubbr_value;
+				UBRR2H_REGISTER = (ubbr_value>>8);
 		
 			#ifdef USART2_U2X_SPEED
 				UCSR2A_REGISTER |= (1<<U2X2_BIT); // enable double speed
@@ -72,8 +72,8 @@
 		#endif // USE_USART2
 		#ifdef USE_USART3
 			case 3:
-				UBRR3L_REGISTER = (uint8_t) baudRate;
-				UBRR3H_REGISTER = (baudRate>>8);
+				UBRR3L_REGISTER = (uint8_t) ubbr_value;
+				UBRR3H_REGISTER = (ubbr_value>>8);
 		
 			#ifdef USART3_U2X_SPEED
 				UCSR3A_REGISTER |= (1<<U2X3_BIT); // enable double speed
@@ -133,10 +133,10 @@
 	
 #else // no USART1/2/3
 	
-	USART::USART(uint16_t baudRate)
+	USART::USART(uint16_t ubbr_value)
 	{
-		UBRR0L_REGISTER = (uint8_t) baudRate;
-		UBRR0H_REGISTER = (baudRate>>8);
+		UBRR0L_REGISTER = (uint8_t) ubbr_value;
+		UBRR0H_REGISTER = (ubbr_value>>8);
 	
 	#ifdef USART0_U2X_SPEED
 		UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed

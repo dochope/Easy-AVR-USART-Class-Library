@@ -343,10 +343,9 @@ public: // house
  *                            Initializers                                          *
  ************************************************************************************/
 #if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
-	USART(uint16_t baudRate = BAUD_CALC(9600), uint8_t usartcnter = 0);
+	USART(uint16_t ubbr_value = BAUD_CALC(9600), uint8_t usartcnter = 0);
 #else
-	USART(uint16_t baudRate = BAUD_CALC(9600));
-	 // UCSRC_reg can be used to set other than 8n1 transmission
+	USART(uint16_t ubbr_value = BAUD_CALC(9600));
 #endif
 	
 	void set_UCSRC(uint8_t UCSRC_reg);
@@ -391,7 +390,7 @@ public: // house
 		
 	uint8_t getbin(uint8_t &data); // reads binary data from a buffer and loads it into &data byte 
 	// in case of empty buffers returning flag is set to BUFFER_EMPTY (1) 
-	// don't forget to set RX0/1_BINARY_MODE flag
+	// don't forget to set RXn_BINARY_MODE flag
 	// uint16_t getbin(void); CSIIWWTMMFA
 	
 	uint8_t AvailableBytes(void); // returns number of bytes waiting in the receiver buffer
