@@ -388,7 +388,7 @@ public: // house
 	// adds NULL byte at the end of string (positioned at bufferlimit-1)
 		#define getsl gets // for compatibility with C library
 		
-	uint8_t get_data(uint8_t &data); // reads binary data from a buffer and loads it into &data byte
+	uint8_t getData(uint8_t &data); // reads binary data from a buffer and loads it into &data byte
 	// in case of empty buffers returning flag is set to BUFFER_EMPTY (1) 
 	// don't forget to set RXn_BINARY_MODE flag
 	// uint16_t getbin(void); CSIIWWTMMFA

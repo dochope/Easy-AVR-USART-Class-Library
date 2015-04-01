@@ -296,7 +296,7 @@
 		*buffer = 0; // set last byte in buffer to NULL 
 	}
 	
-	uint8_t USART::get_data(uint8_t &data)
+	uint8_t USART::getData(uint8_t &data)
 	{
 		register uint8_t tmp_rx_first_byte = rx_first_byte;
 		
