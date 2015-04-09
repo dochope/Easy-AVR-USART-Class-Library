@@ -56,14 +56,14 @@
 #include <stdlib.h>
 
 #ifndef F_CPU
-#error F_CPU is undefined, USART cannot work correctly without this parametr
+	#error F_CPU is undefined, USART cannot work correctly without this parametr
 #endif
 
-#define BAUD_CALC(x) ((F_CPU+(x)*8UL) / (16UL*(x))-1) // macro calculating UBBR value
-#define DOUBLE_BAUD_CALC(x) ((F_CPU+(x)*4UL) / (8UL*(x))-1) // macro calculating UBBR value for double speed
+#define BAUD_CALC(x) ((F_CPU+(x)*8UL) / (16UL*(x))-1UL) // macro calculating UBBR value
+#define DOUBLE_BAUD_CALC(x) ((F_CPU+(x)*4UL) / (8UL*(x))-1UL) // macro calculating UBBR value for double speed
 
 #ifdef DEBUG
-#warning defined DEBUG mode flag, if you want to reduce code size, switch to release mode instead
+	#warning defined DEBUG mode flag, if you want to reduce code size, switch to release mode instead
 #endif
 
 #ifndef RX_BUFFER_SIZE
@@ -167,11 +167,53 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 
 #endif
 
+#if defined(__AVR_ATmega8515__)||defined(__AVR_ATmega8515L__)
+#define USE_USART0
+
+	#define RX0_INTERRUPT		USART_RX_vect
+	#define TX0_INTERRUPT		USART_TX_vect
+	#define UDR0_REGISTER		UDR
+	#define UBRR0L_REGISTER		UBRRL
+	#define UBRR0H_REGISTER		UBRRH
+	#define UCSR0A_REGISTER		UCSRA
+	#define UCSR0B_REGISTER		UCSRB
+	#define UCSR0C_REGISTER		UCSRC
+	#define TXCIE0_BIT  		TXCIE
+	#define RXCIE0_BIT  		RXCIE
+	#define TXEN0_BIT   		TXEN
+	#define RXEN0_BIT   		RXEN
+	#define U2X0_BIT    		U2X
+	
+#endif
+
+#if defined(__AVR_ATmega162__)
+
+#ifndef NO_USART0
+#define USE_USART0
+
+#define RX0_INTERRUPT		USART0_RXC_vect
+#define TX0_INTERRUPT		USART0_TXC_vect
+#define UDR0_REGISTER		UDR0
+#define UBRR0L_REGISTER		UBRR0L
+#define UBRR0H_REGISTER		UBRR0H
+#define UCSR0A_REGISTER		UCSR0A
+#define UCSR0B_REGISTER		UCSR0B
+#define UCSR0C_REGISTER		UCSR0C
+#define TXCIE0_BIT  		TXCIE0
+#define RXCIE0_BIT  		RXCIE0
+#define TXEN0_BIT   		TXEN0
+#define RXEN0_BIT   		RXEN0
+#define U2X0_BIT    		U2X0
+
+#endif //NO_USART0
+#endif
+
 #if defined(__AVR_ATmega644__)||defined(__AVR_ATmega644P__)||defined(__AVR_ATmega644PA__)\
-||defined(__AVR_ATmega1284P__)||defined(__AVR_ATmega128__)||defined(__AVR_ATmega128L__)\
-||defined(__AVR_ATmega64__)||defined(__AVR_ATmega64L__)||defined(__AVR_ATmega1281__)\
-||defined(__AVR_ATmega2561__)||defined(__AVR_ATmega640__)||defined(__AVR_ATmega1280__)\
-||defined(__AVR_ATmega2560__)
+||defined(__AVR_ATmega1284P__)||defined(__AVR_ATmega1284__)||defined(__AVR_ATmega128__)\
+||defined(__AVR_ATmega128L__)||defined(__AVR_ATmega64__)||defined(__AVR_ATmega64L__)\
+||defined(__AVR_ATmega1281__)||defined(__AVR_ATmega2561__)||defined(__AVR_ATmega640__)\
+||defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
+
 #ifndef NO_USART0
 #define USE_USART0
 
@@ -252,6 +294,10 @@ defined(__AVR_ATmega328P__)||defined(__AVR_ATmega328__)
 #endif // NO_USART3
 
 #endif // 640/1280/2560
+
+#if !defined(USE_USART0) && !defined(USE_USART1) && !defined(USE_USART2) && !defined(USE_USART3)
+	#error USART not available or unknown mcu
+#endif
 
 #ifndef USE_USART0
 	#define NO_TX0_INTERRUPT
