@@ -296,18 +296,32 @@
 		*buffer = 0; // set last byte in buffer to NULL 
 	}
 	
+	uint8_t USART::getData(uint8_t *data)
+	{
+		register uint8_t tmp_rx_first_byte = rx_first_byte;
+		
+		if(tmp_rx_first_byte != rx_last_byte) // if buffer is not empty
+		{
+			*data = rx_buffer[tmp_rx_first_byte];
+			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
+			return COMPLETED; // result = 0
+		}
+		
+		return BUFFER_EMPTY; // in this case data value is a trash // result = 1
+	}
+	
 	uint8_t USART::getData(uint8_t &data)
 	{
 		register uint8_t tmp_rx_first_byte = rx_first_byte;
 		
-		data = rx_buffer[tmp_rx_first_byte];
 		if(tmp_rx_first_byte != rx_last_byte) // if buffer is not empty
 		{
+			data = rx_buffer[tmp_rx_first_byte];
 			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
 			return COMPLETED; // result = 0
 		}
-		else 
-			return BUFFER_EMPTY; // in this case data value is a trash // result = 1
+		
+		return BUFFER_EMPTY; // in this case data value is a trash // result = 1
 	}
 	
 	uint8_t USART::AvailableBytes(void)
@@ -339,16 +353,16 @@
 		register char tmp;
 		tmp = UDR0_REGISTER; // save received character to temporary register
 	
-		register uint8_t tmp_rx_last_byte = pUSART0 -> rx_last_byte + 1; // saves 20 bytes // working only in this way, in the other adds 18 bytes to stock size
+		register uint8_t tmp_rx_last_byte = pUSART0 -> rx_last_byte + 1; 
 		
-	#ifdef RX0_BINARY_MODE // not optimal and no one knows why 
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte)) // tmp_rx_last_byte + 1 
+	#ifdef RX0_BINARY_MODE
+		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte)) 
 	#else
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r')) // tmp_rx_last_byte + 1 
+		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r')) 
 	#endif
 		{
-			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp; // tmp_rx_last_byte 
-			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK; // calculate new position of RX tail in buffer // tmp_rx_last_byte + 1
+			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp; 
+			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK; // calculate new position of RX tail in buffer 
 		}
 		
 	}
@@ -380,13 +394,13 @@
 		register uint8_t tmp_rx_last_byte = pUSART1 -> rx_last_byte + 1;
 		
 	#ifdef RX1_BINARY_MODE
-		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART1 -> rx_last_byte+1
+		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte)) 
 	#else
-		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART1 -> rx_last_byte+1
+		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	
 	#endif
 		{
-			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART1 -> rx_last_byte
-			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART1 -> rx_last_byte+1
+			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	
+			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	
 		}
 		
 	}
@@ -418,13 +432,13 @@
 		register uint8_t tmp_rx_last_byte = pUSART2 -> rx_last_byte + 1;
 	
 	#ifdef RX2_BINARY_MODE
-		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART2 -> rx_last_byte+1
+		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte)) 
 	#else
-		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART2 -> rx_last_byte+1
+		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	
 	#endif
 		{
-			pUSART2 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART2 -> rx_last_byte
-			pUSART2 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART2 -> rx_last_byte+1
+			pUSART2 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	
+			pUSART2 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;
 		}
 	
 	}
@@ -456,13 +470,13 @@
 		register uint8_t tmp_rx_last_byte = pUSART3 -> rx_last_byte + 1;
 	
 	#ifdef RX3_BINARY_MODE
-		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte)) // pUSART3 -> rx_last_byte+1
+		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte)) 
 	#else
-		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	// pUSART3 -> rx_last_byte+1
+		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	
 	#endif
 		{
-			pUSART3 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	// pUSART3 -> rx_last_byte
-			pUSART3 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	// pUSART3 -> rx_last_byte+1
+			pUSART3 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	
+			pUSART3 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	
 		}
 		
 	}
