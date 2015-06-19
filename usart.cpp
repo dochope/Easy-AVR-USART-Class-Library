@@ -225,6 +225,14 @@
 		this -> putstr(buffer);
 	}
 	
+	void USART::putint(int16_t data, uint8_t radix)
+	{
+		char buffer[17]; // heading, 15 digit bytes, NULL
+		itoa(data, buffer, radix);
+
+		this -> putstr(buffer);
+	}
+	
 	void USART::put_hex(int16_t data)
 	{
 		char buffer[6]; // heading, 4 digit bytes, NULL
@@ -235,11 +243,20 @@
 	
 	void USART::putlong(int32_t data)
 	{
-		char buffer[17]; // heading, 15 digit bytes, NULL
+		char buffer[12]; // heading, 10 digit bytes, NULL
 		ltoa(data, buffer, 10);
 		
 		this -> putstr(buffer);
 	}
+	
+	void USART::putlong(int32_t data, uint8_t radix)
+	{
+		char buffer[17]; // heading, 15 digit bytes, NULL
+		ltoa(data, buffer, radix);
+		
+		this -> putstr(buffer);
+	}
+	
 	void USART::putfloat(float data)
 	{
 		char buffer[16];
@@ -251,6 +268,7 @@
 		
 		this -> putstr(p);
 	}
+	
 	void USART::putfloat(float data, uint8_t size, uint8_t precision)
 	{
 		char buffer[size+1];

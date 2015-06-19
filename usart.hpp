@@ -525,8 +525,13 @@ public: // house
 		// macro to automatically put a string constant into flash
 	
 	void putint(int16_t data);
+	void putint(int16_t data, uint8_t radix);
+	
 	void put_hex(int16_t data);
+	
 	void putlong(int32_t data);
+	void putlong(int32_t data, uint8_t radix);
+	
 	void putfloat(float data);
 	void putfloat(float data, uint8_t size, uint8_t precision);
 #endif // NO_USART_TX
