@@ -1,3 +1,13 @@
+//**************************************************************
+// ****** FUNCTIONS FOR USART COMMUNICATION *******
+//**************************************************************
+//Compiler          : AVR-GCC
+//Author            : jnk0le@hotmail.com
+//                    https://github.com/jnk0le
+//Date              : 13 February 2015
+//License           : MIT
+//**************************************************************
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
@@ -21,11 +31,12 @@
 
 #if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
 	
-	USART::USART(uint16_t ubbr_value, uint8_t usartcnter)
+	void USART::init(uint16_t ubbr_value, uint8_t usartcnter)
 	{
 		usartct = usartcnter;
 		switch(usartcnter)
 		{
+			default: // first found case as default (byte saving)
 		#ifdef USE_USART1
 			case 0:
 				UBRR0L_REGISTER = (uint8_t) ubbr_value;
@@ -35,7 +46,7 @@
 				UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
 			#endif
 				UCSR0B_REGISTER = USART0_CONFIG_B; 
-				// (1<<TXCIE0_BIT)|(1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT); 
+				// (1<<RXCIE0_BIT)|(1<<TXEN0_BIT)|(1<<RXEN0_BIT); 
 				// 8n1 is set by default, setting UCSRC is not needed
 				pUSART0 = this; // IS SPARTA
 				break;
@@ -49,7 +60,7 @@
 				UCSR1A_REGISTER |= (1<<U2X1_BIT); // enable double speed
 			#endif
 				UCSR1B_REGISTER = USART1_CONFIG_B;
-				// (1<<TXCIE1_BIT)|(1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT);
+				// (1<<RXCIE1_BIT)|(1<<TXEN1_BIT)|(1<<RXEN1_BIT);
 				// 8n1 is set by default, setting UCSRC is not needed
 				pUSART1 = this; // IS SPARTA
 				break;
@@ -64,7 +75,7 @@
 				UCSR2A_REGISTER |= (1<<U2X2_BIT); // enable double speed
 			#endif
 				UCSR2B_REGISTER = USART2_CONFIG_B;
-				// (1<<TXCIE2_BIT)|(1<<RXCIE2_BIT)|(1<<TXEN2_BIT)|(1<<RXEN2_BIT);
+				// (1<<RXCIE2_BIT)|(1<<TXEN2_BIT)|(1<<RXEN2_BIT);
 				// 8n1 is set by default, setting UCSRC is not needed
 				pUSART2 = this; // IS SPARTA
 				break;
@@ -79,22 +90,20 @@
 				UCSR3A_REGISTER |= (1<<U2X3_BIT); // enable double speed
 			#endif
 				UCSR3B_REGISTER = USART3_CONFIG_B;
-				// (1<<TXCIE3_BIT)|(1<<RXCIE3_BIT)|(1<<TXEN3_BIT)|(1<<RXEN3_BIT);
+				// (1<<RXCIE3_BIT)|(1<<TXEN3_BIT)|(1<<RXEN3_BIT);
 				// 8n1 is set by default, setting UCSRC is not needed
 				pUSART3 = this; // IS SPARTA
 				break;
 		#endif // USE_USART3
 		}
-		
-	#ifndef NO_USART_TX
-		interrupt_semaphore = unlocked;
-	#endif
+	
 	}
 	
 	void USART::set_UCSRC(uint8_t UCSRC_reg);
 	{
 		switch(usartct)
 		{
+			default:
 		#ifdef USE_USART0
 			case 0: UCSR0C_REGISTER |= UCSRC_reg; break;
 		#endif // USE_USART0
@@ -115,6 +124,7 @@
 	{
 		switch(usartct)
 		{
+			default:
 		#ifdef USE_USART0
 			case 0: UCSR0A_REGISTER |= (1<<U2X0_BIT); break;
 		#endif // USE_USART0
@@ -133,7 +143,7 @@
 	
 #else // no USART1/2/3
 	
-	USART::USART(uint16_t ubbr_value)
+	void USART::init(uint16_t ubbr_value)
 	{
 		UBRR0L_REGISTER = (uint8_t) ubbr_value;
 		UBRR0H_REGISTER = (ubbr_value>>8);
@@ -142,13 +152,10 @@
 		UCSR0A_REGISTER |= (1<<U2X0_BIT); // enable double speed
 	#endif
 		UCSR0B_REGISTER = USART0_CONFIG_B; 
-		// (1<<TXEN0_BIT)|(1<<RXEN0_BIT)|(1<<TXCIE0_BIT)|(1<<RXCIE0_BIT); 
+		// (1<<TXEN0_BIT)|(1<<RXEN0_BIT)|(1<<RXCIE0_BIT); 
 		// 8n1 is set by default, setting UCSRC is not needed 
-		pUSART0 = this; // IS SPARTA
+		pUSART0 = this; 
 	
-	#ifndef NO_USART_TX
-		interrupt_semaphore = unlocked;
-	#endif
 	}
 	
 	void USART::set_UCSRC(uint8_t UCSRC_reg)
@@ -165,38 +172,42 @@
 #ifndef NO_USART_TX
 	void USART::putc(char data)
 	{
-		register uint8_t tmp_tx_last_byte = tx_last_byte;
-		//register uint8_t tmp_tx_first_byte = tx_first_byte; // causes issues, makes infinite loop at transmit buffer overflow
-		
-		tx_buffer[tmp_tx_last_byte] = data;
-		tmp_tx_last_byte = tx_last_byte = (tmp_tx_last_byte + 1) & TX_BUFFER_MASK; // calculate new position of TX tail in buffer
+		register uint8_t tmp_tx_last_byte = (tx_last_byte + 1) & TX_BUFFER_MASK; ;
 		
 		while(tx_first_byte == tmp_tx_last_byte); // wait for free space in buffer
 		
-		if(interrupt_semaphore == unlocked) // if transmitter interrupt is disabled
+		tx_buffer[tmp_tx_last_byte] = data;
+		tx_last_byte = tmp_tx_last_byte;
+		
+	#if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
+		switch(usartct)
 		{
-			interrupt_semaphore = locked;
-				
-		#if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
-			switch(usartct)
-			{
-			#ifndef NO_TX0_INTERRUPT
-				case 0: UDR0_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-			#endif
-			#ifndef NO_TX1_INTERRUPT
-				case 1: UDR1_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-			#endif
-			#ifndef NO_TX2_INTERRUPT
-				case 2: UDR2_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-			#endif
-			#ifndef NO_TX3_INTERRUPT
-				case 3: UDR3_REGISTER = tx_buffer[tx_first_byte]; break; // enable transmitter interrupt
-			#endif
-			}
-		#else
-			UDR0_REGISTER = tx_buffer[tx_first_byte]; // enable transmitter interrupt
-		#endif
+			default: // first found case as default (byte saving)
+		#ifndef NO_TX0_INTERRUPT
+			case 0:
+				UCSR0B_REGISTER |= (1<<UDRIE0_BIT); // enable UDRE interrupt
+			break;
+		#endif // NO_TX0_INTERRUPT
+		#ifndef NO_TX1_INTERRUPT
+			case 1:
+				UCSR1B_REGISTER |= (1<<UDRIE1_BIT); // enable UDRE interrupt
+			break;
+		#endif // NO_TX1_INTERRUPT
+		#ifndef NO_TX2_INTERRUPT
+			case 2:
+				UCSR2B_REGISTER |= (1<<UDRIE2_BIT); // enable UDRE interrupt
+			break;
+		#endif // NO_TX2_INTERRUPT
+		#ifndef NO_TX3_INTERRUPT
+			case 3:
+				UCSR3B_REGISTER |= (1<<UDRIE3_BIT); // enable UDRE interrupt
+			//break;
+		#endif // NO_TX3_INTERRUPT
 		}
+	#else
+		UCSR0B_REGISTER |= (1<<UDRIE0_BIT); // enable UDRE interrupt
+	#endif
+		
 	}
 
 	void USART::putstr(char *string)
@@ -213,8 +224,8 @@
 
 	void USART::puts_p(const char *string)
 	{
-		while(pgm_read_byte(string)) 
-			this -> putc(pgm_read_byte(string++));
+		register char c;
+		while ((c = pgm_read_byte(string++)) ) this -> putc(c);
 	}
 	
 	void USART::putint(int16_t data)
@@ -230,14 +241,6 @@
 		char buffer[17]; // heading, 15 digit bytes, NULL
 		itoa(data, buffer, radix);
 
-		this -> putstr(buffer);
-	}
-	
-	void USART::put_hex(int16_t data)
-	{
-		char buffer[6]; // heading, 4 digit bytes, NULL
-		itoa(data, buffer, 16);
-		
 		this -> putstr(buffer);
 	}
 	
@@ -257,6 +260,14 @@
 		this -> putstr(buffer);
 	}
 	
+	void USART::put_hex(int16_t data)
+	{
+		char buffer[6]; // heading, 4 digit bytes, NULL
+		itoa(data, buffer, 16);
+		
+		this -> putstr(buffer);
+	}
+	
 	void USART::putfloat(float data)
 	{
 		char buffer[16];
@@ -269,10 +280,10 @@
 		this -> putstr(p);
 	}
 	
-	void USART::putfloat(float data, uint8_t size, uint8_t precision)
+	void USART::putfloat(float data, uint8_t precision)
 	{
-		char buffer[size+1];
-		dtostrf(data, size, precision, buffer);
+		char buffer[16];
+		dtostrf(data, 15, precision, buffer);
 		
 		char *p = buffer;
 		while(*p == ' ') // remove all unwanted spaces
@@ -285,17 +296,20 @@
 #ifndef NO_USART_RX
 	char USART::getc(void)
 	{
-		register char temp;
+		register uint8_t tmp_rx_first_byte = rx_first_byte;
 		
-		register uint8_t tmp_rx_first_byte = rx_first_byte; 
-		register uint8_t tmp_rx_last_byte = rx_last_byte;
+		if(tmp_rx_first_byte == rx_last_byte) return 0;
+		rx_first_byte = tmp_rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK;
 		
-		temp = (tmp_rx_first_byte == tmp_rx_last_byte) ? 0:rx_buffer[tmp_rx_first_byte]; 
-		if(tmp_rx_first_byte != tmp_rx_last_byte) 
-			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
+	#ifdef RX0_GETC_ECHO
+		register uint8_t tmp = rx_buffer[tmp_rx_first_byte];
 		
-		if(temp == '\n')   temp = 0;
-		return temp;
+		this -> putc(tmp);
+		return tmp;
+	#else
+		return rx_buffer[tmp_rx_first_byte];
+	#endif
+
 	}
 	
 	void USART::gets(char *buffer)
@@ -303,6 +317,7 @@
 		do *buffer = this -> getc();
 		while(*buffer++);
 	}
+	
 	void USART::gets(char *buffer, uint8_t bufferlimit)
 	{
 		while(--bufferlimit)
@@ -314,52 +329,58 @@
 		*buffer = 0; // set last byte in buffer to NULL 
 	}
 	
+	void USART::getln(char *buffer, uint8_t bufferlimit)
+	{
+		while(--bufferlimit)
+		{
+			do{
+				*buffer = this -> getc();
+			}while(*buffer == 0);
+			
+			if(*buffer == '\r')
+			{
+				this -> getc();
+				break;
+			}
+			buffer++;
+		}
+		*buffer = 0;
+	}
+	
 	uint8_t USART::getData(uint8_t *data)
 	{
 		register uint8_t tmp_rx_first_byte = rx_first_byte;
 		
-		if(tmp_rx_first_byte != rx_last_byte) // if buffer is not empty
-		{
-			*data = rx_buffer[tmp_rx_first_byte];
-			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
-			return COMPLETED; // result = 0
-		}
+		if(tmp_rx_first_byte == rx_last_byte) return BUFFER_EMPTY; // result = 0
 		
-		return BUFFER_EMPTY; // in this case data value is a trash // result = 1
-	}
-	
-	uint8_t USART::getData(uint8_t &data)
-	{
-		register uint8_t tmp_rx_first_byte = rx_first_byte;
+		rx_first_byte = tmp_rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK;
+		*data = rx_buffer[tmp_rx_first_byte];
 		
-		if(tmp_rx_first_byte != rx_last_byte) // if buffer is not empty
-		{
-			data = rx_buffer[tmp_rx_first_byte];
-			rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK; // calculate new position of RX head in buffer
-			return COMPLETED; // result = 0
-		}
-		
-		return BUFFER_EMPTY; // in this case data value is a trash // result = 1
+		return COMPLETED; // result = 1
 	}
 	
 	uint8_t USART::AvailableBytes(void)
 	{
 		return (rx_last_byte - rx_first_byte) & RX_BUFFER_MASK;
 	}
+	
 #endif // NO_USART_RX
 
 #ifndef NO_TX0_INTERRUPT
 	ISR(TX0_INTERRUPT)
 	{
-		register uint8_t tmp_tx_first_byte = pUSART0 -> tx_first_byte = (pUSART0 -> tx_first_byte + 1) & TX_BUFFER_MASK; 
-		// calculate new position of TX head in buffer, write back and use it as register variable 
+		register uint8_t tmp_tx_first_byte = pUSART0 -> tx_first_byte;
+		
 		if(tmp_tx_first_byte != pUSART0 -> tx_last_byte)
 		{
+			tmp_tx_first_byte = (tmp_tx_first_byte + 1) & TX0_BUFFER_MASK; // calculate new position of TX head in buffer
+			
 			UDR0_REGISTER = pUSART0 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+			pUSART0 -> tx_first_byte = tmp_tx_first_byte;
 		}
 		else
 		{
-			pUSART0 -> interrupt_semaphore = unlocked;
+			UCSR0B_REGISTER &= ~(1<<UDRIE0_BIT);
 		}
 		
 	}
@@ -368,19 +389,13 @@
 #ifndef NO_RX0_INTERRUPT
 	ISR(RX0_INTERRUPT)
 	{
-		register char tmp;
-		tmp = UDR0_REGISTER; // save received character to temporary register
-	
-		register uint8_t tmp_rx_last_byte = pUSART0 -> rx_last_byte + 1; 
+		register uint8_t tmp_rx_last_byte = (pUSART0 -> rx_last_byte + 1) & RX0_BUFFER_MASK;
+		register uint8_t tmp = UDR0_REGISTER; // save received character to temporary register
 		
-	#ifdef RX0_BINARY_MODE
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte)) 
-	#else
-		if(pUSART0 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r')) 
-	#endif
+		if(pUSART0 -> rx_first_byte != tmp_rx_last_byte)
 		{
-			pUSART0 -> rx_buffer[tmp_rx_last_byte-1] = tmp; 
-			pUSART0 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK; // calculate new position of RX tail in buffer 
+			pUSART0 -> rx_buffer[tmp_rx_last_byte] = tmp;
+			pUSART0 -> rx_last_byte = tmp_rx_last_byte;
 		}
 		
 	}
@@ -389,15 +404,18 @@
 #ifndef NO_TX1_INTERRUPT
 	ISR(TX1_INTERRUPT)
 	{
-		register uint8_t tmp_tx_first_byte = pUSART1 -> tx_first_byte = (pUSART1 -> tx_first_byte + 1) & TX_BUFFER_MASK;
-	
+		register uint8_t tmp_tx_first_byte = pUSART1 -> tx_first_byte;
+		
 		if(tmp_tx_first_byte != pUSART1 -> tx_last_byte)
 		{
+			tmp_tx_first_byte = (tmp_tx_first_byte + 1) & TX1_BUFFER_MASK; // calculate new position of TX head in buffer
+			
 			UDR1_REGISTER = pUSART1 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+			pUSART1 -> tx_first_byte = tmp_tx_first_byte;
 		}
 		else
 		{
-			pUSART1 -> interrupt_semaphore = unlocked;
+			UCSR1B_REGISTER &= ~(1<<UDRIE1_BIT);
 		}
 		
 	}
@@ -406,19 +424,13 @@
 #ifndef NO_RX1_INTERRUPT
 	ISR(RX1_INTERRUPT)
 	{
-		register char tmp;
-		tmp = UDR1_REGISTER; // save received character to temporary register
-	
-		register uint8_t tmp_rx_last_byte = pUSART1 -> rx_last_byte + 1;
+		register uint8_t tmp_rx_last_byte = (pUSART1 -> rx_last_byte + 1) & RX1_BUFFER_MASK;
+		register uint8_t tmp = UDR1_REGISTER; // save received character to temporary register
 		
-	#ifdef RX1_BINARY_MODE
-		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte)) 
-	#else
-		if(pUSART1 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	
-	#endif
+		if(pUSART1 -> rx_first_byte != tmp_rx_last_byte)
 		{
-			pUSART1 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	
-			pUSART1 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	
+			pUSART1 -> rx_buffer[tmp_rx_last_byte] = tmp;
+			pUSART1 -> rx_last_byte = tmp_rx_last_byte;
 		}
 		
 	}
@@ -427,15 +439,18 @@
 #ifndef NO_TX2_INTERRUPT
 	ISR(TX2_INTERRUPT)
 	{
-		register uint8_t tmp_tx_first_byte = pUSART2 -> tx_first_byte = (pUSART2 -> tx_first_byte + 1) & TX_BUFFER_MASK;
-	
+		register uint8_t tmp_tx_first_byte = pUSART2 -> tx_first_byte;
+		
 		if(tmp_tx_first_byte != pUSART2 -> tx_last_byte)
 		{
+			tmp_tx_first_byte = (tmp_tx_first_byte + 1) & TX2_BUFFER_MASK; // calculate new position of TX head in buffer
+			
 			UDR2_REGISTER = pUSART2 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+			pUSART2 -> tx_first_byte = tmp_tx_first_byte;
 		}
 		else
 		{
-			pUSART2 -> interrupt_semaphore = unlocked;
+			UCSR2B_REGISTER &= ~(1<<UDRIE2_BIT);
 		}
 	
 	}
@@ -444,19 +459,13 @@
 #ifndef NO_RX2_INTERRUPT
 	ISR(RX2_INTERRUPT)
 	{
-		register char tmp;
-		tmp = UDR2_REGISTER; // save received character to temporary register
-	
-		register uint8_t tmp_rx_last_byte = pUSART2 -> rx_last_byte + 1;
-	
-	#ifdef RX2_BINARY_MODE
-		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte)) 
-	#else
-		if(pUSART2 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	
-	#endif
+		register uint8_t tmp_rx_last_byte = (pUSART2 -> rx_last_byte + 1) & RX2_BUFFER_MASK;
+		register uint8_t tmp = UDR2_REGISTER; // save received character to temporary register
+		
+		if(pUSART2 -> rx_first_byte != tmp_rx_last_byte)
 		{
-			pUSART2 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	
-			pUSART2 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;
+			pUSART2 -> rx_buffer[tmp_rx_last_byte] = tmp;
+			pUSART2 -> rx_last_byte = tmp_rx_last_byte;
 		}
 	
 	}
@@ -465,15 +474,18 @@
 #ifndef NO_TX3_INTERRUPT
 	ISR(TX3_INTERRUPT)
 	{
-		register uint8_t tmp_tx_first_byte = pUSART3 -> tx_first_byte = (pUSART3 -> tx_first_byte + 1) & TX_BUFFER_MASK;
-	
+		register uint8_t tmp_tx_first_byte = pUSART3 -> tx_first_byte;
+				
 		if(tmp_tx_first_byte != pUSART3 -> tx_last_byte)
 		{
+			tmp_tx_first_byte = (tmp_tx_first_byte + 1) & TX3_BUFFER_MASK; // calculate new position of TX head in buffer
+					
 			UDR3_REGISTER = pUSART3 -> tx_buffer[tmp_tx_first_byte]; // transmit character from the buffer
+			pUSART3 -> tx_first_byte = tmp_tx_first_byte;
 		}
 		else
 		{
-			pUSART3 -> interrupt_semaphore = unlocked;
+			UCSR3B_REGISTER &= ~(1<<UDRIE3_BIT);
 		}
 		
 	}
@@ -482,19 +494,13 @@
 #ifndef NO_RX3_INTERRUPT
 	ISR(RX3_INTERRUPT)
 	{
-		register char tmp;
-		tmp = UDR3_REGISTER; // save received character to temporary register
+		register uint8_t tmp_rx_last_byte = (pUSART3 -> rx_last_byte + 1) & RX3_BUFFER_MASK;
+		register uint8_t tmp = UDR3_REGISTER; // save received character to temporary register
 	
-		register uint8_t tmp_rx_last_byte = pUSART3 -> rx_last_byte + 1;
-	
-	#ifdef RX3_BINARY_MODE
-		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte)) 
-	#else
-		if(pUSART3 -> rx_first_byte != (tmp_rx_last_byte) && (tmp != '\r'))	
-	#endif
+		if(pUSART3 -> rx_first_byte != tmp_rx_last_byte) 
 		{
-			pUSART3 -> rx_buffer[tmp_rx_last_byte-1] = tmp;	
-			pUSART3 -> rx_last_byte = (tmp_rx_last_byte) & RX_BUFFER_MASK;	
+			pUSART3 -> rx_buffer[tmp_rx_last_byte] = tmp;
+			pUSART3 -> rx_last_byte = tmp_rx_last_byte;
 		}
 		
 	}
