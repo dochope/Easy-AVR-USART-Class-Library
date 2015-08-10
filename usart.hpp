@@ -16,8 +16,12 @@
 //#define NO_USART_RX // disable all receiver code and dependencies 
 //#define NO_USART_TX // disable all transmitter code and dependencies
 
-#define RX_STDIO_GETCHAR_ECHO // echoes back received characters in getchar() function (for reading in scanf())
+//#define RX_STDIO_GETCHAR_ECHO // echoes back received characters in getchar() function (for reading in scanf())
 #define RX_GETC_ECHO // echoes back received characters in getc() function
+
+//#define RX_NEWLINE_MODE 2 // 0 - \r,  1 - \n,  2 - /r/n
+// lot of terminals sends only \r character as a newline terminator, instead of \r\n or even unix style \n 
+// (BTW PuTTY doesn't allow to change this) but in return requires \r\n terminator to show not broken text
 
 //#define USE_DOUBLE_SPEED // DEPRECATED // enables double speed for all available USART interfaces 
 
@@ -44,11 +48,6 @@
 //#define USART1_U2X_SPEED // DEPRECATED // enables double speed for USART1 // combining with USE_DOUBLE_SPEED is not necessary
 //#define USART2_U2X_SPEED // DEPRECATED // enables double speed for USART2 // combining with USE_DOUBLE_SPEED is not necessary
 //#define USART3_U2X_SPEED // DEPRECATED // enables double speed for USART3 // combining with USE_DOUBLE_SPEED is not necessary
-
-//#define RX0_GETC_ECHO
-//#define RX1_GETC_ECHO
-//#define RX2_GETC_ECHO
-//#define RX3_GETC_ECHO
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -145,11 +144,17 @@ enum {COMPLETED = 1, BUFFER_EMPTY = 0};
 	#define USART3_U2X_SPEED
 #endif
 
-#ifdef RX_GETC_ECHO
-	#define RX0_GETC_ECHO
-	#define RX1_GETC_ECHO
-	#define RX2_GETC_ECHO
-	#define RX3_GETC_ECHO
+#ifdef RX_NEWLINE_MODE
+	
+	#if (RX_NEWLINE_MODE == 0)
+		#define RX_NEWLINE_MODE_R
+	#elif (RX_NEWLINE_MODE == 1)
+		#define RX_NEWLINE_MODE_N
+	#else // RX_NEWLINE_MODE == 2
+		#define RX_NEWLINE_MODE_RN
+	#endif
+#else
+	#define RX_NEWLINE_MODE_RN // 2
 #endif
 
 #if defined(__AVR_ATtiny2313__)||defined(__AVR_ATtiny2313A__)||defined(__AVR_ATtiny4313)
@@ -627,16 +632,73 @@ public: // house
 	void putint(int16_t data);
 	void putint(int16_t data, uint8_t radix);
 	
+	void putint(uint16_t data);
+	void putint(uint16_t data, uint8_t radix);
+	
 	void putint(int32_t data) { this -> putlong(data); }
 	void putint(int32_t data, uint8_t radix) { this -> putlong(data, radix); }
+		
+	void putint(uint32_t data) { this -> putlong(data); }
+	void putint(uint32_t data, uint8_t radix) { this -> putlong(data, radix); }
 	
 	void putlong(int32_t data);
 	void putlong(int32_t data, uint8_t radix);
+	
+	void putlong(uint32_t data);
+	void putlong(uint32_t data, uint8_t radix);
 	
 	void put_hex(int16_t data);
 	
 	void putfloat(float data);
 	void putfloat(float data, uint8_t precision);
+	
+	USART& operator<<(char c)
+	{
+		this -> putc(c);
+		return *this;
+	}
+	
+	USART& operator<<(const char* str)
+	{
+		this -> puts(str);
+		return *this;
+	}
+	
+	USART& operator<<(char* str)
+	{
+		this -> putstr(str);
+		return *this;
+	}
+	
+	USART& operator<<(int16_t num)
+	{
+		this -> putint(num);
+		return *this;
+	}
+	
+	USART& operator<<(uint16_t num)
+	{
+		this -> putint(num);
+		return *this;
+	}
+	
+	USART& operator<<(int32_t num)
+	{
+		this -> putlong(num);
+		return *this;
+	}
+	
+	USART& operator<<(uint32_t num)
+	{
+		this -> putlong(num);
+		return *this;
+	}
+
+	USART& operator<<(double num)
+	{
+		this -> putfloat(num);
+		return *this;
+	}
 	
 #endif // NO_USART_TX
 /************************************************************************************
@@ -652,11 +714,67 @@ public: // house
 	void getln(char *buffer, uint8_t bufferlimit); // reads one line from the buffer
 	// waits for newline terminator or reached bufferlimit // adds NULL byte at the end of string
 	
+	void getlnToFirstWhiteSpace(char *buffer, uint8_t bufferlimit); // read one line to the first whitescape after the string
+	//cuts all whitespaces before string and one after the string
+	
 	uint8_t getData(uint8_t &data) { return this -> getData(&data); }
 	uint8_t getData(uint8_t *data); // reads binary data from a buffer and loads it into &data byte
 	// in case of empty buffers returned flag is set to BUFFER_EMPTY - NULL
 	
 	uint8_t AvailableBytes(void); // returns number of bytes waiting in the receiver buffer
+	uint8_t Available(void) { return this -> AvailableBytes(); } 
+	
+	USART& operator>>(char& c)
+	{
+		while( !(c = this -> getc()) );
+		return *this;
+	}
+
+	USART& operator>>(char* buff)
+	{
+		this -> getln(buff, 255); // not safe reading by now
+		return *this;
+	}
+	
+	USART& operator>>(int16_t& num)
+	{
+		char buff[32];
+		
+		this -> getlnToFirstWhiteSpace(buff, 32);
+		
+		num = atoi(buff);
+		return *this;
+	}
+	
+	USART& operator>>(int32_t& num)
+	{
+		char buff[32];
+			
+		this -> getlnToFirstWhiteSpace(buff, 32);
+			
+		num = atol(buff);
+		return *this;
+	}
+		
+	USART& operator>>(double& num)
+	{
+		char buff[32];
+		
+		this -> getlnToFirstWhiteSpace(buff, 32);
+		
+		num = atof(buff);
+		return *this;
+	}
+	
+	USART& operator>>(float& num)
+	{
+		char buff[32];
+		
+		this -> getlnToFirstWhiteSpace(buff, 32);
+		
+		num = atof(buff);
+		return *this;
+	}
 	
 #endif // NO_USART_RX
 };

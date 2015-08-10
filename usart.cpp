@@ -244,6 +244,22 @@
 		this -> putstr(buffer);
 	}
 	
+	void USART::putint(uint16_t data)
+	{
+		char buffer[7]; // heading, 5 digit bytes, NULL
+		utoa(data, buffer, 10);
+
+		this -> putstr(buffer);
+	}
+		
+	void USART::putint(uint16_t data, uint8_t radix)
+	{
+		char buffer[17]; // heading, 15 digit bytes, NULL
+		utoa(data, buffer, radix);
+
+		this -> putstr(buffer);
+	}
+	
 	void USART::putlong(int32_t data)
 	{
 		char buffer[12]; // heading, 10 digit bytes, NULL
@@ -260,10 +276,26 @@
 		this -> putstr(buffer);
 	}
 	
+	void USART::putlong(uint32_t data)
+	{
+		char buffer[12]; // heading, 10 digit bytes, NULL
+		ultoa(data, buffer, 10);
+		
+		this -> putstr(buffer);
+	}
+	
+	void USART::putlong(uint32_t data, uint8_t radix)
+	{
+		char buffer[17]; // heading, 15 digit bytes, NULL
+		ultoa(data, buffer, radix);
+		
+		this -> putstr(buffer);
+	}
+	
 	void USART::put_hex(int16_t data)
 	{
 		char buffer[6]; // heading, 4 digit bytes, NULL
-		itoa(data, buffer, 16);
+		utoa(data, buffer, 16);
 		
 		this -> putstr(buffer);
 	}
@@ -301,17 +333,26 @@
 		if(tmp_rx_first_byte == rx_last_byte) return 0;
 		rx_first_byte = tmp_rx_first_byte = (tmp_rx_first_byte+1) & RX_BUFFER_MASK;
 		
-	#ifdef RX0_GETC_ECHO
-		register uint8_t tmp = rx_buffer[tmp_rx_first_byte];
+	#ifdef RX_GETC_ECHO
+		register char tmp = rx_buffer[tmp_rx_first_byte];
+		
+	#ifdef RX_NEWLINE_MODE_N
+		if(tmp == '\n') this -> putc('\r');
+	#endif
 		
 		this -> putc(tmp);
+		
+	#ifdef RX_NEWLINE_MODE_R
+		if(tmp == '\r') this -> putc('\n');
+	#endif
+	
 		return tmp;
 	#else
 		return rx_buffer[tmp_rx_first_byte];
 	#endif
 
 	}
-	
+
 	void USART::gets(char *buffer)
 	{
 		do *buffer = this -> getc();
@@ -337,14 +378,56 @@
 				*buffer = this -> getc();
 			}while(*buffer == 0);
 			
+		#ifdef RX_NEWLINE_MODE_N
+			if(*buffer == '\n')
+		#else
 			if(*buffer == '\r')
+		#endif
 			{
-				this -> getc();
+			#ifdef RX_NEWLINE_MODE_RN
+				while( !(this -> getc()) );
+			#endif
 				break;
 			}
 			buffer++;
 		}
 		*buffer = 0;
+	}
+	
+	void USART::getlnToFirstWhiteSpace(char *buffer, uint8_t bufferlimit)
+	{
+		uint16_t ZeroPbuff = (uint16_t)buffer; // save position of the first element in buffer
+		
+		while(--bufferlimit)
+		{
+			do{
+				*buffer = this -> getc();
+			}while(*buffer == 0);
+			
+			if(*buffer <= 32) // less complex isspace()
+			{
+			#ifdef RX_NEWLINE_MODE_N
+				if(*buffer == '\n')
+			#else
+				if(*buffer == '\r')
+			#endif
+				{
+				#ifdef RX_NEWLINE_MODE_RN
+					while( !(this -> getc()) );
+				#endif
+					break;
+				}
+				else if( (uint16_t)buffer == ZeroPbuff ) 
+					continue; // buffer is empty so keep cutting whitespaces
+				else 
+					break; // string reading is done, we will exit
+				
+			}
+			buffer++;
+		}
+		*buffer = 0;
+		
+		
 	}
 	
 	uint8_t USART::getData(uint8_t *data)
