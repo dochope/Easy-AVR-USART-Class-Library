@@ -24,6 +24,10 @@ int main(void)
 	
 	char buffer[13];
 	
+	serial << "say my name : \r\n";
+	serial >> buffer;
+	serial << "so it's " << buffer << "\r\n you have got dam'n right\r\n" << 1111 << 1.234;
+	
 	while(1)
 	{
 		uart0.puts("bytes waiting in buffer : ");

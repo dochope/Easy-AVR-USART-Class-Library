@@ -7,6 +7,7 @@ buffers for receive/transmit. Designed to be easy to use, especially like arduin
 - support for up to 4 USART's
 - allow for binary transmission
 - optimized as much as possible to reduce code size
+- cin/cout like streams (<< and >>)
 - and much more
 
 simple "hello world" gives
