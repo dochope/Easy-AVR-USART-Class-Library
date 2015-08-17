@@ -68,7 +68,6 @@
 #endif
 
 #ifdef DEBUG
-	//#warning "defined DEBUG mode flag, if you want to reduce code size, switch to release mode instead"
 	#define USART_DO_NOT_INLINE
 #endif
 
@@ -652,9 +651,15 @@ public: // house
 	void putfloat(float data);
 	void putfloat(float data, uint8_t precision);
 	
-	USART& operator<<(char c)
+	USART& operator<<(char &c)
 	{
 		this -> putc(c);
+		return *this;
+	}
+	
+	USART& operator<<(uint8_t dat)
+	{
+		this -> put_hex(dat);
 		return *this;
 	}
 	
@@ -715,7 +720,9 @@ public: // house
 	// waits for newline terminator or reached bufferlimit // adds NULL byte at the end of string
 	
 	void getlnToFirstWhiteSpace(char *buffer, uint8_t bufferlimit); // read one line to the first whitescape after the string
-	//cuts all whitespaces before string and one after the string
+	// cuts all whitespaces before string and one after the string
+	
+	char skipWhiteSpaces(void); // returns first nonspace character found in the buffer
 	
 	uint8_t getData(uint8_t &data) { return this -> getData(&data); }
 	uint8_t getData(uint8_t *data); // reads binary data from a buffer and loads it into &data byte

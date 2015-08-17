@@ -396,38 +396,43 @@
 	
 	void USART::getlnToFirstWhiteSpace(char *buffer, uint8_t bufferlimit)
 	{
-		uint16_t ZeroPbuff = (uint16_t)buffer; // save position of the first element in buffer
+		*buffer++ = this -> skipWhiteSpaces();
+		bufferlimit--;
 		
 		while(--bufferlimit)
 		{
 			do{
 				*buffer = this -> getc();
-			}while(*buffer == 0);
+			} while(*buffer == 0);
 			
-			if(*buffer <= 32) // less complex isspace()
+		#ifdef RX_NEWLINE_MODE_N
+			if(*buffer == '\n')
+		#else // RX_NEWLINE_MODE_R
+			if(*buffer == '\r')
+		#endif
 			{
-			#ifdef RX_NEWLINE_MODE_N
-				if(*buffer == '\n')
-			#else
-				if(*buffer == '\r')
+			#ifdef RX_NEWLINE_MODE_RN
+				while( !(this -> getc()) );
 			#endif
-				{
-				#ifdef RX_NEWLINE_MODE_RN
-					while( !(this -> getc()) );
-				#endif
-					break;
-				}
-				else if( (uint16_t)buffer == ZeroPbuff ) 
-					continue; // buffer is empty so keep cutting whitespaces
-				else 
-					break; // string reading is done, we will exit
-				
+				break;
 			}
+			else if(*buffer <= 32)
+				break; // string reading is done, we will exit
+
 			buffer++;
 		}
 		*buffer = 0;
+	}
+	
+	char USART::skipWhiteSpaces(void)
+	{
+		register char c;
 		
+		do{
+			c = this -> getc();
+		}while(c <= 32);
 		
+		return c;
 	}
 	
 	uint8_t USART::getData(uint8_t *data)

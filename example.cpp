@@ -24,9 +24,16 @@ int main(void)
 	
 	char buffer[13];
 	
-	serial << "say my name : \r\n";
+	serial << "say my name: ";
 	serial >> buffer;
-	serial << "so it's " << buffer << "\r\n you have got dam'n right\r\n" << 1111 << 1.234;
+	serial << "so it's " << buffer << "\r\n you are dam'n right\r\n";
+
+	int a;
+	float b;
+	
+	serial << "give me some numbers: ";
+	serial >> a >> b;
+	serial << "so: "<< a << "\t" << b << "\t 0x" << (uint8_t)254;
 	
 	while(1)
 	{

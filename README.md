@@ -10,7 +10,7 @@ buffers for receive/transmit. Designed to be easy to use, especially like arduin
 - cin/cout like streams (<< and >>)
 - and much more
 
-simple "hello world" gives
+simple "hello world" code gives
 
          text      data       bss       dec       hex   filename
           474        16        70       560       230   avrtpp.elf
