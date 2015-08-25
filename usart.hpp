@@ -631,22 +631,28 @@ public: // house
 	void putint(int16_t data);
 	void putint(int16_t data, uint8_t radix);
 	
-	void putint(uint16_t data);
-	void putint(uint16_t data, uint8_t radix);
+	void putint(uint16_t data) { this -> putuint(data); }
+	void putint(uint16_t data, uint8_t radix) { this -> putuint(data, radix); }
+	
+	void putuint(uint16_t data);
+	void putuint(uint16_t data, uint8_t radix);
 	
 	void putint(int32_t data) { this -> putlong(data); }
 	void putint(int32_t data, uint8_t radix) { this -> putlong(data, radix); }
 		
-	void putint(uint32_t data) { this -> putlong(data); }
-	void putint(uint32_t data, uint8_t radix) { this -> putlong(data, radix); }
+	void putint(uint32_t data) { this -> putulong(data); }
+	void putint(uint32_t data, uint8_t radix) { this -> putulong(data, radix); }
 	
 	void putlong(int32_t data);
 	void putlong(int32_t data, uint8_t radix);
 	
-	void putlong(uint32_t data);
-	void putlong(uint32_t data, uint8_t radix);
+	void putlong(uint32_t data){ this -> putulong(data); }
+	void putlong(uint32_t data, uint8_t radix){ this -> putulong(data, radix); }
+
+	void putulong(uint32_t data);
+	void putulong(uint32_t data, uint8_t radix);
 	
-	void put_hex(int16_t data);
+	void put_hex(uint16_t data);
 	
 	void putfloat(float data);
 	void putfloat(float data, uint8_t precision);
@@ -724,6 +730,10 @@ public: // house
 	
 	char skipWhiteSpaces(void); // returns first nonspace character found in the buffer
 	
+	int16_t getint(void);
+	int32_t getlong(void);
+	float getfloat(void);
+	
 	uint8_t getData(uint8_t &data) { return this -> getData(&data); }
 	uint8_t getData(uint8_t *data); // reads binary data from a buffer and loads it into &data byte
 	// in case of empty buffers returned flag is set to BUFFER_EMPTY - NULL
@@ -745,41 +755,25 @@ public: // house
 	
 	USART& operator>>(int16_t& num)
 	{
-		char buff[32];
-		
-		this -> getlnToFirstWhiteSpace(buff, 32);
-		
-		num = atoi(buff);
+		num = this -> getint();
 		return *this;
 	}
 	
 	USART& operator>>(int32_t& num)
 	{
-		char buff[32];
-			
-		this -> getlnToFirstWhiteSpace(buff, 32);
-			
-		num = atol(buff);
+		num = this -> getlong();
 		return *this;
 	}
 		
 	USART& operator>>(double& num)
 	{
-		char buff[32];
-		
-		this -> getlnToFirstWhiteSpace(buff, 32);
-		
-		num = atof(buff);
+		num = this -> getfloat();
 		return *this;
 	}
 	
 	USART& operator>>(float& num)
 	{
-		char buff[32];
-		
-		this -> getlnToFirstWhiteSpace(buff, 32);
-		
-		num = atof(buff);
+		num = this -> getfloat();
 		return *this;
 	}
 	

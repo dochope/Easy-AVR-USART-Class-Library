@@ -26,6 +26,13 @@ defined  NO_USART_RX flag gives
 Program Memory Usage    :   406 bytes   1,2 % Full
 Data Memory Usage       :   52 bytes   2,5 % Full
 
+# Notes
+Lot of terminals sends only CR character as a newline terminator, instead of CRLF or even unix style LF
+(BTW PuTTY doesn't allow to change this) but in return requires CRLF terminator to show not broken text.
+This behaviour can be covered by RX_NEWLINE_MODE macro, by default set to CRLF.
+0 - CR
+1 - LF
+2 - CRLF (default)
 
 
 
