@@ -19,7 +19,8 @@
 //#define RX_STDIO_GETCHAR_ECHO // echoes back received characters in getchar() function (for reading in scanf())
 #define RX_GETC_ECHO // echoes back received characters in getc() function
 
-//#define RX_NEWLINE_MODE 2 // 0 - \r,  1 - \n,  2 - /r/n
+//#define PUTC_CONVERT_LF_TO_CRLF // allow for unix style (\n only) newline terminator in stored strings // not included into putc_noblock
+#define RX_NEWLINE_MODE 2 // 0 - \r,  1 - \n,  2 - /r/n
 // lot of terminals sends only \r character as a newline terminator, instead of \r\n or even unix style \n 
 // (BTW PuTTY doesn't allow to change this) but in return requires \r\n terminator to show not broken text
 
@@ -119,8 +120,7 @@
 #define TX3_BUFFER_MASK (TX3_BUFFER_SIZE - 1)
 #define RX3_BUFFER_MASK (RX3_BUFFER_SIZE - 1)
 
-enum {locked, unlocked};
-enum {COMPLETED = 1, BUFFER_EMPTY = 0};	
+enum {COMPLETED = 1, BUFFER_EMPTY = 0, BUFFER_FULL = 0};	
 
 #ifdef NO_USART_RX // remove all RX interrupts
 	#define NO_RX0_INTERRUPT
@@ -617,6 +617,7 @@ public: // house
 #ifndef NO_USART_TX
 	
 	void putc(char data); // put character/data into transmitter ring buffer
+	uint8_t putc_noblock(char data); // returns BUFFER_FULL (false) if buffer is full and character cannot be sent at the moment
 	
 	void putstr(char *string, uint8_t BytesToWrite); // in case of bascom users or buffers without NULL byte ending (binary transmission allowed)
 	void putstr(char *string); // send string from the array buffer 
@@ -742,6 +743,12 @@ public: // house
 	uint8_t Available(void) { return this -> AvailableBytes(); } 
 	
 	USART& operator>>(char& c)
+	{
+		while( !(c = this -> getc()) );
+		return *this;
+	}
+	
+	USART& operator>>(uint8_t& c)
 	{
 		while( !(c = this -> getc()) );
 		return *this;

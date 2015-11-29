@@ -178,7 +178,11 @@
 //******************************************************************
 	void USART::putc(char data)
 	{
-		register uint8_t tmp_tx_last_byte = (tx_last_byte + 1) & TX_BUFFER_MASK; ;
+	#ifdef PUTC_CONVERT_LF_TO_CRLF
+		if(data == '\n')
+			this -> putc(usartct, '\r');
+	#endif
+		register uint8_t tmp_tx_last_byte = (tx_last_byte + 1) & TX_BUFFER_MASK;
 		
 		while(tx_first_byte == tmp_tx_last_byte); // wait for free space in buffer
 		
@@ -214,6 +218,53 @@
 		UCSR0B_REGISTER |= (1<<UDRIE0_BIT); // enable UDRE interrupt
 	#endif
 		
+	}
+	
+//******************************************************************
+//Function  : Send single character/byte.
+//Arguments : Character/byte to send.
+//Return    : Status value: 0 = BUFFER_FULL, 1 = COMPLETED.
+//Note      : If character cannot be sent due to full transmit buffer, function will abort transmitting character
+//******************************************************************
+	uint8_t USART::putc_noblock(char data)
+	{
+		register uint8_t tmp_tx_last_byte = (tx_last_byte + 1) & TX_BUFFER_MASK;
+		
+		if(tx_first_byte == tmp_tx_last_byte)
+			return BUFFER_FULL;
+		
+		tx_buffer[tmp_tx_last_byte] = data;
+		tx_last_byte = tmp_tx_last_byte;
+		
+	#if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
+		switch(usartct)
+		{
+			default: // first found case as default (byte saving)
+		#ifndef NO_TX0_INTERRUPT
+			case 0:
+			UCSR0B_REGISTER |= (1<<UDRIE0_BIT); // enable UDRE interrupt
+			break;
+		#endif // NO_TX0_INTERRUPT
+		#ifndef NO_TX1_INTERRUPT
+			case 1:
+			UCSR1B_REGISTER |= (1<<UDRIE1_BIT); // enable UDRE interrupt
+			break;
+		#endif // NO_TX1_INTERRUPT
+		#ifndef NO_TX2_INTERRUPT
+			case 2:
+			UCSR2B_REGISTER |= (1<<UDRIE2_BIT); // enable UDRE interrupt
+			break;
+		#endif // NO_TX2_INTERRUPT
+		#ifndef NO_TX3_INTERRUPT
+			case 3:
+			UCSR3B_REGISTER |= (1<<UDRIE3_BIT); // enable UDRE interrupt
+			//break;
+		#endif // NO_TX3_INTERRUPT
+		}
+	#else
+		UCSR0B_REGISTER |= (1<<UDRIE0_BIT); // enable UDRE interrupt
+	#endif
+		return COMPLETED;
 	}
 
 //******************************************************************
