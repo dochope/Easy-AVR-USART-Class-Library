@@ -40,7 +40,7 @@ int main(void)
 		uart0.puts("bytes waiting in buffer : ");
 		uart0.putint(uart0.AvailableBytes()); // ask for bytes waiting in receiver buffer
 		uart0.getln(buffer, 13); // read 13 bytes or one line from usart buffer
-		uart0.puts("/r/n");
+		uart0.puts("\r\n");
 		
 		uart1.putstr(buffer); // write string array to usart buffer
 		_delay_ms(5000);
