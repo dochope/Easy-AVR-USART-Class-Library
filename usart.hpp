@@ -45,10 +45,10 @@
 //#define NO_TX2_INTERRUPT // disables interrupt handling and frees TX2 gpio port // combining with NO_USART_TX is not necessary
 //#define NO_TX3_INTERRUPT // disables interrupt handling and frees TX3 gpio port // combining with NO_USART_TX is not necessary
 
-//#define USART0_U2X_SPEED // DEPRECATED // enables double speed for USART0 // combining with USE_DOUBLE_SPEED is not necessary
-//#define USART1_U2X_SPEED // DEPRECATED // enables double speed for USART1 // combining with USE_DOUBLE_SPEED is not necessary
-//#define USART2_U2X_SPEED // DEPRECATED // enables double speed for USART2 // combining with USE_DOUBLE_SPEED is not necessary
-//#define USART3_U2X_SPEED // DEPRECATED // enables double speed for USART3 // combining with USE_DOUBLE_SPEED is not necessary
+//#define USART0_U2X_SPEED  // enables double speed for USART0 // combining with USE_DOUBLE_SPEED is not necessary
+//#define USART1_U2X_SPEED  // enables double speed for USART1 // combining with USE_DOUBLE_SPEED is not necessary
+//#define USART2_U2X_SPEED  // enables double speed for USART2 // combining with USE_DOUBLE_SPEED is not necessary
+//#define USART3_U2X_SPEED  // enables double speed for USART3 // combining with USE_DOUBLE_SPEED is not necessary
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -646,10 +646,10 @@ public: // house
  ************************************************************************************/
 #if defined(USE_USART1)||defined(USE_USART2)||defined(USE_USART3)
 	void init(uint16_t ubbr_value = BAUD_CALC(9600), uint8_t usartcnter = 0);
-	void begin(uint16_t ubbr_value = BAUD_CALC(9600), uint8_t usartcnter = 0) { this -> init(ubbr_value, usartcnter); }
+	void begin(uint16_t baud = 9600, uint8_t usartcnter = 0) { this -> init(BAUD_CALC(baud)), usartcnter); }
 #else
 	void init(uint16_t ubbr_value = BAUD_CALC(9600));
-	void begin(uint16_t ubbr_value = BAUD_CALC(9600)) { this -> init(ubbr_value); }
+	void begin(uint16_t baud = 9600) { this -> init(BAUD_CALC(baud)); }
 #endif
 	
 	void set_UCSRC(uint8_t UCSRC_reg);
