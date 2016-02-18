@@ -98,49 +98,7 @@
 		}
 	
 	}
-	
-	void USART::set_UCSRC(uint8_t UCSRC_reg);
-	{
-		switch(usartct)
-		{
-			default:
-		#ifdef USE_USART0
-			case 0: UCSR0C_REGISTER = UCSRC_reg; break;
-		#endif // USE_USART0
-		#ifdef USE_USART1
-			case 1: UCSR1C_REGISTER = UCSRC_reg; break;
-		#endif // USE_USART1
-		#ifdef USE_USART2
-			case 2: UCSR2C_REGISTER = UCSRC_reg; break;
-		#endif // USE_USART2
-		#ifdef USE_USART3
-			case 3: UCSR3C_REGISTER = UCSRC_reg; //break;
-		#endif // USE_USART3
-		}
-		
-	}
-	
-	void USART::set_U2X(void) 
-	{
-		switch(usartct)
-		{
-			default:
-		#ifdef USE_USART0
-			case 0: UCSR0A_REGISTER = (1<<U2X0_BIT); break;
-		#endif // USE_USART0
-		#ifdef USE_USART1
-			case 1: UCSR1A_REGISTER = (1<<U2X1_BIT); break;
-		#endif // USE_USART1
-		#ifdef USE_USART2
-			case 2: UCSR2A_REGISTER = (1<<U2X2_BIT); break;
-		#endif // USE_USART2
-		#ifdef USE_USART3
-			case 3: UCSR3A_REGISTER = (1<<U2X3_BIT); //break;
-		#endif // USE_USART3
-		}
-		
-	}
-	
+
 #else // no USART1/2/3
 	
 	void USART::init(uint16_t ubbr_value)
@@ -157,17 +115,8 @@
 		pUSART0 = this; 
 	
 	}
-	
-	void USART::set_UCSRC(uint8_t UCSRC_reg)
-	{
-		UCSR0C_REGISTER = UCSRC_reg;
-	}
-	
-	void USART::set_U2X(void)
-	{
-		UCSR0A_REGISTER = (1<<U2X0_BIT);
-	}
-#endif //USE_USART1
+
+#endif //USE_USART1/2/3
 
 #ifndef NO_USART_TX
 
